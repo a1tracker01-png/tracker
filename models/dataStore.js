@@ -66,9 +66,9 @@ async function getCreatorById(id) {
 
 async function createCreator(data) {
   const id = data.id || Date.now();
-  const followers = typeof data.followers === 'string' 
-    ? (parseInt(data.followers.replace(/[^0-9]/g, '')) || 0) 
-    : (Number(data.followers) || 0);
+  // const followers = typeof data.followers === 'string' 
+  //   ? (parseInt(data.followers.replace(/[^0-9]/g, '')) || 0) 
+  //   : (Number(data.followers) || 0);
 
   if (isDbConnected()) {
     const tagsJson = JSON.stringify(data.tags || []);
@@ -81,7 +81,7 @@ async function createCreator(data) {
       id,
       data.name,
       data.handle,
-      followers,
+      data.followers,
       data.growth || '',
       data.eng || '',
       data.avgV || '',
