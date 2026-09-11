@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qurion Competitor Tracker — Final</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0D0D0D;--s0:#111;--s1:#1A1A1A;--s2:#222;--s3:#2A2A2A;
+--bd:#333;--bds:#444;--bda:#7B2FBE;--bdg:#1D9E75;--bdd:#DC2626;--bdw:#D97706;
+--tp:#F5F5F5;--ts:#AAA;--tm:#666;
+--ta:#C77DFF;--tg:#1D9E75;--td:#EF4444;--tw:#F59E0B;
+--bga:rgba(123,47,190,.15);--bgg:rgba(29,158,117,.15);--bgd:rgba(220,38,38,.12);--bgw:rgba(245,158,11,.12);
+--fa:#7B2FBE;--fah:#9D4EDD;--oa:#fff;--r:8px;
+--fn:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--fm:'SF Mono',monospace
+}
+.light{
+--bg:#F0F0F5;--s0:#F7F7FA;--s1:#EBEBF0;--s2:#FFF;--s3:#E5E5EC;
+--bd:#DDDDE8;--bds:#C0C0CC;--tp:#111;--ts:#444;--tm:#888;
+--bga:rgba(123,47,190,.08);--bgg:rgba(29,158,117,.08);--bgd:rgba(220,38,38,.07);--bgw:rgba(245,158,11,.08)
+}
+body{background:var(--bg);color:var(--tp);font-family:var(--fn);min-height:100vh;padding:1rem;transition:background .2s,color .2s}
+.wrap{max-width:1000px;margin:0 auto;border:0.5px solid var(--bd);border-radius:14px;overflow:hidden}
+/* HDR */
+.hdr{padding:.9rem 1.2rem;background:var(--s2);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.hdr-icon{width:34px;height:34px;border-radius:8px;background:var(--bga);display:flex;align-items:center;justify-content:center}
+.hdr-icon i{color:var(--ta);font-size:17px}
+.hdr-title{font-size:15px;font-weight:600;color:var(--tp)}
+.hdr-sub{font-size:11px;color:var(--tm);margin-top:1px}
+.hdr-r{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 11px;border-radius:var(--r);border:0.5px solid var(--bd);background:var(--s2);color:var(--ts);cursor:pointer;transition:all .15s;font-family:var(--fn);white-space:nowrap}
+.btn:hover{background:var(--s3);color:var(--tp);border-color:var(--bds)}
+.btn.pri{background:var(--fa);color:var(--oa);border-color:var(--fa)}
+.btn.pri:hover{background:var(--fah)}
+.btn.sml{font-size:11px;padding:4px 9px}
+.btn.ghost{background:none;border-color:transparent;color:var(--tm)}
+.btn.ghost:hover{background:var(--s2);color:var(--tp);border-color:var(--bd)}
+.btn i{font-size:13px}
+/* TABS */
+.tabs{display:flex;background:var(--s1);border-bottom:0.5px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 14px;font-size:12px;color:var(--ts);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;font-family:var(--fn);flex-shrink:0}
+.tab:hover{color:var(--tp)}
+.tab.active{color:var(--ta);border-bottom-color:var(--fa);background:var(--s2)}
+.tab i{font-size:13px}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:.8rem 1.2rem;background:var(--s0);border-bottom:0.5px solid var(--bd)}
+.sc{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:8px 11px}
+.sc-n{font-size:19px;font-weight:600;color:var(--tp);line-height:1}
+.sc-l{font-size:10px;color:var(--tm);margin-top:3px}
+/* SECTION */
+.section{display:none;padding:1rem 1.2rem;background:var(--s0);min-height:300px}
+.section.active{display:block}
+/* TOOLBAR */
+.tb{padding:.7rem 1.2rem;background:var(--s1);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.srch{display:flex;align-items:center;gap:6px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:0 9px;flex:1;min-width:140px}
+.srch i{color:var(--tm);font-size:13px}
+.srch input{background:none;border:none;outline:none;font-size:12px;color:var(--tp);width:100%;padding:6px 0;font-family:var(--fn)}
+select{font-size:12px;padding:5px 9px;border-radius:var(--r);border:0.5px solid var(--bd);background:var(--s2);color:var(--tp);font-family:var(--fn);cursor:pointer}
+/* CREATOR CARD */
+.cc{background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;overflow:hidden;transition:border-color .15s;margin-bottom:8px}
+.cc:hover{border-color:var(--bds)}
+.cc.pinned{border-color:var(--bda)}
+.cc-main{padding:.85rem 1rem;display:flex;gap:10px;align-items:flex-start}
+.cc-rank{font-size:11px;font-weight:600;color:var(--tm);min-width:20px;padding-top:2px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.pin-btn{background:none;border:none;cursor:pointer;color:var(--tm);font-size:14px;padding:0;transition:color .15s}
+.pin-btn.pinned{color:var(--ta)}
+.pin-btn:hover{color:var(--ta)}
+.cc-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;overflow:hidden;border:1.5px solid var(--bd);cursor:pointer;position:relative}
+.cc-av:hover .av-ht{display:flex}
+.av-ht{display:none;position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:50%;align-items:center;justify-content:center}
+.av-ht i{font-size:13px;color:#fff}
+.cc-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.cc-body{flex:1;min-width:0}
+.cc-nr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+.cc-name{font-size:13px;font-weight:600;color:var(--tp)}
+.cc-handle{font-size:11px;color:var(--ta)}
+.bdg{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+.cc-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:5px;align-items:center}
+.cc-stat{font-size:11px;color:var(--ts);display:flex;align-items:center;gap:3px}
+.cc-stat i{font-size:11px}
+.cc-cat{font-size:10px;color:var(--tm);background:var(--s1);padding:2px 7px;border-radius:20px;border:0.5px solid var(--bd)}
+.cc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.cc-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--s1);border:0.5px solid var(--bd);color:var(--ts)}
+.cc-note{font-size:11px;color:var(--ts);background:var(--s1);border-radius:var(--r);padding:6px 9px;margin-bottom:7px;line-height:1.5;border-left:2px solid var(--bda)}
+.cc-actions{display:flex;gap:4px;flex-wrap:wrap}
+.cc-btn{font-size:11px;padding:4px 9px;border-radius:var(--r);border:0.5px solid var(--bd);background:var(--s1);color:var(--ts);cursor:pointer;display:inline-flex;align-items:center;gap:3px;font-family:var(--fn);transition:all .15s}
+.cc-btn:hover{background:var(--s3);color:var(--tp)}
+.cc-btn.del:hover{background:var(--bgd);color:var(--td);border-color:var(--bdd)}
+.cc-btn i{font-size:12px}
+/* REELS PANEL */
+.rp{border-top:0.5px solid var(--bd);padding:.75rem 1rem;background:var(--s0)}
+.rp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.rp-title{font-size:12px;font-weight:600;color:var(--tp);display:flex;align-items:center;gap:5px}
+.rp-title i{font-size:13px;color:var(--ta)}
+.reel-list{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+.ri{display:flex;align-items:flex-start;gap:8px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:7px 10px}
+.ri-date{font-size:10px;color:var(--tm);white-space:nowrap;min-width:62px}
+.ri-body{flex:1;min-width:0}
+.ri-topic{font-size:12px;font-weight:500;color:var(--tp);margin-bottom:2px}
+.ri-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ri-views{font-size:11px;color:var(--tg);display:flex;align-items:center;gap:2px;font-weight:500}
+.ri-fmt{font-size:10px;padding:1px 6px;border-radius:20px;background:var(--bga);color:var(--ta)}
+.ri-hook{font-size:10px;color:var(--tm)}
+.ri-viral{font-size:10px;padding:1px 6px;border-radius:20px;background:var(--bgd);color:var(--td)}
+.ri-acts{display:flex;gap:4px;flex-shrink:0}
+.ri-btn{background:none;border:none;cursor:pointer;color:var(--tm);font-size:13px;padding:2px;display:flex;align-items:center}
+.ri-btn:hover{color:var(--tp)}
+.ri-btn.del:hover{color:var(--td)}
+/* OVERDUE */
+.overdue-bar{background:var(--bgw);border:0.5px solid var(--bdw);border-radius:var(--r);padding:7px 11px;margin-bottom:.8rem;font-size:11px;color:var(--tw);display:flex;align-items:center;gap:7px;line-height:1.5}
+.overdue-bar i{font-size:14px;flex-shrink:0}
+/* SECTION TITLE */
+.stitle{font-size:13px;font-weight:600;color:var(--tp);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.stitle i{font-size:14px;color:var(--ta)}
+.ghdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.gcnt{font-size:11px;color:var(--tm);background:var(--s1);border:0.5px solid var(--bd);padding:2px 8px;border-radius:20px}
+/* EMPTY */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--tm)}
+.empty i{font-size:34px;display:block;margin-bottom:10px}
+.empty-t{font-size:14px;font-weight:600;color:var(--ts);margin-bottom:5px}
+.empty-s{font-size:12px}
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+.mo.open{display:flex}
+.modal{background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:1.2rem;width:100%;max-width:480px;margin:auto}
+.mo-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.mo-title{font-size:14px;font-weight:600;color:var(--tp)}
+.mo-x{background:none;border:none;cursor:pointer;color:var(--tm);font-size:21px;line-height:1;padding:0}
+.mo-x:hover{color:var(--tp)}
+.av-up{border:1.5px dashed var(--bd);border-radius:var(--r);padding:.85rem;text-align:center;cursor:pointer;margin-bottom:.85rem;transition:border-color .15s}
+.av-up:hover{border-color:var(--bda)}
+.av-prev{width:56px;height:56px;border-radius:50%;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600;overflow:hidden;border:1.5px solid var(--bd)}
+.av-prev img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.up-txt{font-size:11px;color:var(--tm)}
+.fg{margin-bottom:.75rem}
+.fg label{font-size:11px;color:var(--ts);margin-bottom:4px;display:block;font-weight:500}
+.fg input,.fg textarea,.fg select{width:100%;font-size:12px;padding:7px 9px;border-radius:var(--r);border:0.5px solid var(--bd);background:var(--s1);color:var(--tp);font-family:var(--fn);transition:border-color .15s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--bda)}
+.fg input.err{border-color:var(--bdd)}
+.fg textarea{resize:vertical;min-height:60px;line-height:1.5}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tag-row{display:flex;gap:5px}
+.tag-row input{flex:1}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tchip{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--s1);border:0.5px solid var(--bd);color:var(--ts);display:inline-flex;align-items:center;gap:3px}
+.tchip button{background:none;border:none;cursor:pointer;color:var(--tm);font-size:12px;padding:0;line-height:1}
+.mo-foot{display:flex;gap:6px;justify-content:flex-end;margin-top:1rem;padding-top:.85rem;border-top:0.5px solid var(--bd)}
+/* CONFIRM DIALOG */
+.confirm-box{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.confirm-box.open{display:flex}
+.confirm-inner{background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:1.3rem;max-width:360px;width:100%;text-align:center}
+.confirm-title{font-size:14px;font-weight:600;color:var(--tp);margin-bottom:6px}
+.confirm-msg{font-size:12px;color:var(--ts);margin-bottom:1rem;line-height:1.5}
+.confirm-btns{display:flex;gap:8px;justify-content:center}
+/* COMPARISON */
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.cmp-col{background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:1rem}
+.cmp-sel{width:100%;font-size:12px;padding:7px 10px;border-radius:var(--r);border:0.5px solid var(--bd);background:var(--s1);color:var(--tp);margin-bottom:10px;font-family:var(--fn)}
+.cmp-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:5px 0;border-bottom:0.5px solid var(--bd)}
+.cmp-row:last-child{border-bottom:none}
+.cmp-l{color:var(--tm)}
+.cmp-v{font-weight:600;color:var(--tp)}
+.cmp-win{color:var(--tg)}
+/* PATTERNS */
+.pat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.pat-card{background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:.85rem}
+.pat-title{font-size:10px;font-weight:600;color:var(--tm);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.pat-item{padding:3px 0}
+.pat-label{font-size:11px;color:var(--ts)}
+.pat-val{font-size:11px;font-weight:600;color:var(--tp);float:right}
+.pat-bar-bg{height:3px;background:var(--s1);border-radius:2px;margin-top:2px;clear:both}
+.pat-bar{height:3px;border-radius:2px;background:var(--fa)}
+/* INSPIRATION */
+.ins-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-bottom:1rem}
+.ins-card{background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:.85rem}
+.ins-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:5px}
+.ins-creator{font-size:12px;font-weight:600;color:var(--ta)}
+.ins-date{font-size:10px;color:var(--tm)}
+.ins-type{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--bga);color:var(--ta);margin-bottom:5px;display:inline-block}
+.ins-note{font-size:11px;color:var(--ts);line-height:1.5;margin-bottom:6px}
+.ins-tags{display:flex;gap:4px;flex-wrap:wrap}
+.ins-tag{font-size:10px;padding:2px 6px;border-radius:20px;background:var(--s1);border:0.5px solid var(--bd);color:var(--tm)}
+/* VIRAL ALERTS */
+.va-section{background:var(--bgd);border:0.5px solid var(--bdd);border-radius:12px;padding:.85rem 1rem;margin-bottom:.9rem}
+.va-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.va-title{font-size:12px;font-weight:600;color:var(--td);display:flex;align-items:center;gap:5px}
+.va-item{display:flex;align-items:center;gap:7px;background:var(--s2);border-radius:var(--r);padding:6px 9px;border:0.5px solid var(--bd);margin-bottom:4px}
+.va-cr{font-size:12px;font-weight:600;color:var(--tp);min-width:90px}
+.va-note{font-size:11px;color:var(--ts);flex:1;line-height:1.4}
+.va-date{font-size:10px;color:var(--tm);white-space:nowrap}
+.va-del{background:none;border:none;cursor:pointer;color:var(--tm);font-size:13px;padding:0;display:flex;align-items:center}
+.va-del:hover{color:var(--td)}
+.va-add{display:none;gap:5px;margin-top:7px;flex-wrap:wrap}
+.va-add input{flex:1;min-width:100px;font-size:12px;padding:5px 9px;border-radius:var(--r);border:0.5px solid var(--bd);background:var(--s2);color:var(--tp);font-family:var(--fn)}
+.va-add input:focus{outline:none;border-color:var(--bda)}
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:1rem}
+.cal-hc{font-size:10px;color:var(--tm);text-align:center;padding:4px}
+.cal-cell{background:var(--s2);border:0.5px solid var(--bd);border-radius:6px;padding:5px 4px;min-height:54px}
+.cal-cell.today{border-color:var(--bda)}
+.cal-cell.has-post{background:var(--bga)}
+.cal-day{font-size:10px;color:var(--tm);margin-bottom:3px}
+.cal-post{font-size:9px;padding:1px 4px;border-radius:20px;background:var(--fa);color:#fff;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.4}
+/* QUICK NOTES */
+.qnotes{background:var(--s2);border:0.5px solid var(--bdw);border-radius:12px;padding:.85rem 1rem;margin-bottom:.9rem}
+.qn-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.qn-title{font-size:12px;font-weight:600;color:var(--tw);display:flex;align-items:center;gap:5px}
+.qn-title i{font-size:14px}
+textarea.qn-area{width:100%;font-size:12px;background:var(--s1);border:0.5px solid var(--bd);border-radius:var(--r);padding:8px 10px;color:var(--tp);font-family:var(--fn);resize:vertical;min-height:70px;line-height:1.5}
+textarea.qn-area:focus{outline:none;border-color:var(--bdw)}
+/* GROWTH */
+.growth-bars{display:flex;flex-direction:column;gap:5px}
+.gb-item{display:flex;align-items:center;gap:8px}
+.gb-name{font-size:11px;color:var(--ts);min-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gb-bar-bg{flex:1;height:8px;background:var(--s1);border-radius:4px}
+.gb-bar{height:8px;border-radius:4px;background:var(--fa);transition:width .3s}
+.gb-val{font-size:11px;font-weight:600;color:var(--ta);min-width:40px;text-align:right}
+/* WEEKLY SUMMARY */
+.week-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:1rem}
+.ws-card{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:.75rem}
+.ws-n{font-size:20px;font-weight:600;color:var(--tp)}
+.ws-l{font-size:10px;color:var(--tm);margin-top:2px}
+/* TOAST */
+.toast{position:fixed;bottom:16px;right:16px;background:var(--s2);border:0.5px solid var(--bds);border-radius:var(--r);padding:8px 13px;font-size:12px;color:var(--tp);display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.toast.show{opacity:1}
+/* PRINT */
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  .hdr-r,.tabs,.tb,.cc-actions,.rp-hdr .btn,.va-hdr .btn,.va-add,.mo,.toast,.confirm-box,.cc-btn,.ins-del,.ri-acts,.va-del,.qnotes,.pin-btn{display:none!important}
+  .wrap{border:none;max-width:100%}
+  .cc,.ins-card,.va-item,.sc,.pat-card,.ws-card{background:#f9f9f9!important;border:1px solid #ddd!important}
+  .cc-note,.cc-tags,.cc-meta{color:#555!important}
+  .hdr{background:#f0f0f0!important;border-bottom:1px solid #ddd!important}
+  .cc-name,.mo-title,.stitle,.va-title{color:#000!important}
+  .section{display:block!important}
+  .tabs{display:none!important}
+}
+@media(max-width:640px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .cmp-grid{grid-template-columns:1fr}
+  .pat-grid{grid-template-columns:1fr}
+  .ins-grid{grid-template-columns:1fr}
+  .week-sum{grid-template-columns:repeat(2,1fr)}
+  .fg-row{grid-template-columns:1fr}
+  .hdr-r .btn span{display:none}
+  body{padding:.5rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<!-- HDR -->
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-icon"><i class="ti ti-users"></i></div>
+    <div>
+      <div class="hdr-title">Qurion competitor tracker <span style="font-size:10px;background:var(--bga);color:var(--ta);padding:2px 7px;border-radius:20px;margin-left:5px">Final</span></div>
+      <div class="hdr-sub">Track · Analyze · Inspire · Export &nbsp;·&nbsp; <span id="lastUpdated" style="color:var(--tm)"></span></div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <button class="btn sml" onclick="toggleTheme()" title="Toggle theme"><i class="ti ti-sun" id="themeIcon"></i> <span>Light</span></button>
+    <button class="btn sml" onclick="exportCSV()"><i class="ti ti-download"></i> <span>CSV</span></button>
+    <button class="btn sml" onclick="exportJSON()"><i class="ti ti-database-export"></i> <span>Backup</span></button>
+    <button class="btn sml" onclick="document.getElementById('impFile').click()"><i class="ti ti-database-import"></i> <span>Restore</span></button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="btn sml" onclick="window.print()"><i class="ti ti-printer"></i> <span>Print</span></button>
+    <button class="btn sml" style="color:var(--tw);border-color:var(--bdw);background:var(--bgw)" onclick="resetToDefault()"><i class="ti ti-refresh"></i> <span>Reset data</span></button>
+    <button class="btn pri sml" onclick="openAdd()"><i class="ti ti-plus"></i> Add competitor</button>
+  </div>
+</div>
+<!-- TABS -->
+<div class="tabs" id="tabsEl">
+  <button class="tab active" onclick="showTab('creators',this)"><i class="ti ti-users"></i> Competitors</button>
+  <button class="tab" onclick="showTab('reels',this)"><i class="ti ti-player-play"></i> Reels</button>
+  <button class="tab" onclick="showTab('compare',this)"><i class="ti ti-arrows-diff"></i> Compare</button>
+  <button class="tab" onclick="showTab('patterns',this)"><i class="ti ti-chart-bar"></i> Patterns</button>
+  <button class="tab" onclick="showTab('weekly',this)"><i class="ti ti-calendar-week"></i> Weekly</button>
+  <button class="tab" onclick="showTab('calendar',this)"><i class="ti ti-calendar"></i> Calendar</button>
+  <button class="tab" onclick="showTab('inspo',this)"><i class="ti ti-bulb"></i> Inspiration</button>
+  <button class="tab" onclick="showTab('alerts',this)"><i class="ti ti-flame"></i> Viral alerts</button>
+</div>
+<!-- STATS -->
+<div class="stats">
+  <div class="sc"><div class="sc-n" id="sTot">0</div><div class="sc-l">Competitors</div></div>
+  <div class="sc"><div class="sc-n" id="sTrend">0</div><div class="sc-l">Trending/Viral</div></div>
+  <div class="sc"><div class="sc-n" id="sGrow">0</div><div class="sc-l">Growing fast</div></div>
+  <div class="sc"><div class="sc-n" id="sReels">0</div><div class="sc-l">Reels tracked</div></div>
+  <div class="sc"><div class="sc-n" id="sOver">0</div><div class="sc-l" style="color:var(--tw)">Overdue checks</div></div>
+</div>
+
+<!-- TAB: COMPETITORS -->
+<div class="section active" id="tab-creators">
+  <div class="tb">
+    <div class="srch"><i class="ti ti-search"></i><input type="text" placeholder="Search name or handle..." id="srchQ" oninput="renderCreators()"></div>
+    <select id="fCat" onchange="renderCreators()">
+      <option value="all">All categories</option>
+      <option value="Tech Hacks">Tech Hacks (29)</option>
+      <option value="AI Tools">AI Tools (14)</option>
+      <option value="General Tech">General Tech (2)</option>
+      <option value="AI News">AI News (1)</option>
+      <option value="Career Skills">Career Skills (2)</option>
+    </select>
+    <select id="fBdg" onchange="renderCreators()">
+      <option value="all">All badges</option>
+      <option value="trending">🔥 Trending</option>
+      <option value="growing">📈 Growing</option>
+      <option value="viral">⚡ Viral</option>
+      <option value="watch">👀 Watch</option>
+      <option value="inactive">💤 Inactive</option>
+    </select>
+    <select id="srtBy" onchange="renderCreators()">
+      <option value="pinned">Pinned first</option>
+      <option value="followers">By followers</option>
+      <option value="name">By name</option>
+      <option value="checked">By last checked</option>
+      <option value="overdue">Overdue first</option>
+    </select>
+  </div>
+  <div style="padding:0 0 .9rem 0">
+    <div id="overdueBar" style="display:none" class="overdue-bar"><i class="ti ti-alert-triangle"></i><span id="overdueMsg"></span></div>
+    <div class="ghdr"><div style="font-size:13px;font-weight:600;color:var(--tp)">Rankings</div><div class="gcnt" id="cCnt">0 creators</div></div>
+    <div id="creatorGrid"></div>
+    <div class="empty" id="creatorEmpty" style="display:none"><i class="ti ti-users"></i><div class="empty-t">No competitors yet</div><div class="empty-s">Click "Add competitor" to start tracking</div></div>
+  </div>
+</div>
+
+<!-- TAB: REELS -->
+<div class="section" id="tab-reels">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.9rem;align-items:center">
+    <select id="rFiltCr" onchange="renderReelsTab()" style="flex:1;min-width:120px"><option value="all">All creators</option></select>
+    <select id="rFiltV" onchange="renderReelsTab()">
+      <option value="all">All reels</option>
+      <option value="yes">Viral only 🔥</option>
+      <option value="no">Not viral</option>
+    </select>
+    <div class="srch" style="flex:2;min-width:140px"><i class="ti ti-search"></i><input type="text" id="rSrch" placeholder="Search reel topics..." oninput="renderReelsTab()"></div>
+    <select id="rSort" onchange="renderReelsTab()">
+      <option value="date">Sort: Date</option>
+      <option value="views">Sort: Views</option>
+    </select>
+  </div>
+  <div id="reelsGrid"></div>
+  <div class="empty" id="reelsEmpty" style="display:none">
+    <i class="ti ti-player-play"></i>
+    <div class="empty-t">No reels tracked yet</div>
+    <div class="empty-s">Open a competitor card → click "Reels" → add their content</div>
+    <button class="btn pri sml" style="margin:10px auto 0" onclick="showTab('creators',document.querySelector('.tab'))">Go to competitors</button>
+  </div>
+</div>
+
+<!-- TAB: COMPARE -->
+<div class="section" id="tab-compare">
+  <div class="stitle"><i class="ti ti-arrows-diff"></i> Side by side comparison</div>
+  <div class="cmp-grid">
+    <div class="cmp-col"><select class="cmp-sel" id="cmp1" onchange="renderCompare()"><option value="">Select creator A...</option></select><div id="cmpA"><div class="empty" style="padding:1rem"><i class="ti ti-user" style="font-size:24px"></i><div class="empty-s">Select a creator</div></div></div></div>
+    <div class="cmp-col"><select class="cmp-sel" id="cmp2" onchange="renderCompare()"><option value="">Select creator B...</option></select><div id="cmpB"><div class="empty" style="padding:1rem"><i class="ti ti-user" style="font-size:24px"></i><div class="empty-s">Select a creator</div></div></div></div>
+  </div>
+  <div id="cmpResult" style="display:none;background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:1rem">
+    <div class="stitle" style="margin-bottom:8px"><i class="ti ti-trophy"></i> Head to head</div>
+    <div id="cmpContent"></div>
+  </div>
+</div>
+
+<!-- TAB: PATTERNS -->
+<div class="section" id="tab-patterns">
+  <div class="stitle"><i class="ti ti-chart-bar"></i> Content pattern analysis</div>
+  <div class="pat-grid" id="patGrid"></div>
+  <div class="stitle"><i class="ti ti-flame"></i> Top viral reels (tracked)</div>
+  <div id="topViralReels"></div>
+  <div class="stitle" style="margin-top:1rem"><i class="ti ti-trending-up"></i> Follower ranking</div>
+  <div class="growth-bars" id="growthBars"></div>
+</div>
+
+<!-- TAB: WEEKLY SUMMARY -->
+<div class="section" id="tab-weekly">
+  <div class="stitle"><i class="ti ti-calendar-week"></i> This week's summary</div>
+  <div class="week-sum" id="weekSum"></div>
+  <div class="stitle"><i class="ti ti-player-play"></i> Reels added this week</div>
+  <div id="weekReels"></div>
+  <div class="stitle" style="margin-top:1rem"><i class="ti ti-clock"></i> Best posting times — Indian audience</div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:1rem" id="postTimes"></div>
+  <div class="stitle"><i class="ti ti-sticky-note"></i> Quick notes & reminders</div>
+  <div class="qnotes">
+    <div class="qn-hdr">
+      <div class="qn-title"><i class="ti ti-pencil"></i> Your notes</div>
+      <button class="btn sml" onclick="saveQNotes()"><i class="ti ti-check"></i> Save</button>
+    </div>
+    <textarea class="qn-area" id="qnArea" placeholder="Write quick notes here — what to check, ideas to try, competitor observations..."></textarea>
+  </div>
+</div>
+
+<!-- TAB: CALENDAR -->
+<div class="section" id="tab-calendar">
+  <div class="stitle"><i class="ti ti-calendar"></i> Competitor posting calendar</div>
+  <div id="calGrid"></div>
+</div>
+
+<!-- TAB: INSPIRATION -->
+<div class="section" id="tab-inspo">
+  <div style="background:var(--s2);border:0.5px solid var(--bd);border-radius:12px;padding:1rem;margin-bottom:1rem">
+    <div class="stitle" style="margin-bottom:.7rem"><i class="ti ti-bulb"></i> Save an inspiration</div>
+    <div class="fg-row">
+      <div class="fg"><label>Creator name</label><input type="text" id="insCreator" placeholder="e.g. Techburner"></div>
+      <div class="fg"><label>Inspiration type</label>
+        <select id="insType">
+          <option value="Hook">Hook</option>
+          <option value="Script format">Script format</option>
+          <option value="Visual">Visual</option>
+          <option value="CTA">CTA</option>
+          <option value="Editing style">Editing style</option>
+          <option value="Topic angle">Topic angle</option>
+          <option value="Thumbnail">Thumbnail</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>What inspired you?</label><textarea id="insNote" placeholder="Describe the hook, format, or idea that worked well..." rows="2"></textarea></div>
+    <div class="fg">
+      <label>Tags</label>
+      <div class="tag-row"><input type="text" id="insTagIn" placeholder="Add tag..." onkeydown="if(event.key==='Enter'){addInsTag();event.preventDefault()}"><button class="btn sml" onclick="addInsTag()">+ Add</button></div>
+      <div class="tags-wrap" id="insTagsWrap"></div>
+    </div>
+    <button class="btn pri sml" onclick="saveInspiration()"><i class="ti ti-plus"></i> Save inspiration</button>
+  </div>
+  <div class="ghdr"><div style="font-size:13px;font-weight:600;color:var(--tp)">Saved inspirations</div><div class="gcnt" id="insCnt">0</div></div>
+  <div class="ins-grid" id="insGrid"></div>
+  <div class="empty" id="insEmpty" style="display:none"><i class="ti ti-bulb"></i><div class="empty-t">No inspirations saved</div><div class="empty-s">Save hooks, formats, and ideas from competitors above</div></div>
+</div>
+
+<!-- TAB: VIRAL ALERTS -->
+<div class="section" id="tab-alerts">
+  <div class="va-section">
+    <div class="va-hdr">
+      <div class="va-title"><i class="ti ti-flame"></i> Active viral alerts</div>
+      <button class="btn sml" onclick="toggleVA()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+    <div id="vaActive"></div>
+    <div class="va-add" id="vaAddRow">
+      <input type="text" id="vaCreator" placeholder="Creator name...">
+      <input type="text" id="vaNote" placeholder="What's going viral? Topic, views, format...">
+      <button class="btn pri sml" onclick="saveVA()">Save</button>
+      <button class="btn sml" onclick="cancelVA()">Cancel</button>
+    </div>
+  </div>
+  <div class="stitle"><i class="ti ti-history"></i> Alert history</div>
+  <div id="vaHistory"></div>
+</div>
+</div><!-- /wrap -->
+
+<!-- MODAL: CREATOR -->
+<div class="mo" id="moCreator">
+  <div class="modal">
+    <div class="mo-hdr"><div class="mo-title" id="moTitle">Add competitor</div><button class="mo-x" onclick="closeMo('moCreator')">×</button></div>
+    <div class="av-up" onclick="document.getElementById('avIn').click()">
+      <div class="av-prev" id="avPrev"></div>
+      <div class="up-txt"><i class="ti ti-camera" style="font-size:12px"></i> Click to upload profile picture (optional)</div>
+      <input type="file" id="avIn" accept="image/*" style="display:none" onchange="handleAv(event)">
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Creator name *</label><input type="text" id="fName" placeholder="e.g. Techburner" oninput="refreshAvPrev()"></div>
+      <div class="fg"><label>Instagram handle *</label><input type="text" id="fHandle" placeholder="@handle"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Followers</label><input type="text" id="fFW" placeholder="e.g. 2.5M or 2500000"></div>
+      <div class="fg"><label>Growth (this month)</label><input type="text" id="fGrowth" placeholder="e.g. +50K or +2%"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Engagement rate</label><input type="text" id="fEng" placeholder="e.g. 3.5%"></div>
+      <div class="fg"><label>Avg views / reel</label><input type="text" id="fAvgV" placeholder="e.g. 200K"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Category</label>
+        <select id="fCat2">
+          <option value="AI Tools">AI Tools</option>
+          <option value="Tech Hacks">Tech Hacks</option>
+          <option value="AI News">AI News</option>
+          <option value="Earn & Grow">Earn & Grow</option>
+          <option value="Career Skills">Career Skills</option>
+          <option value="General Tech">General Tech</option>
+        </select>
+      </div>
+      <div class="fg"><label>Badge</label>
+        <select id="fBdg2">
+          <option value="none">No badge</option>
+          <option value="trending">🔥 Trending</option>
+          <option value="growing">📈 Growing fast</option>
+          <option value="viral">⚡ Viral</option>
+          <option value="watch">👀 Watch closely</option>
+          <option value="inactive">💤 Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Content type tags</label>
+      <div class="tag-row"><input type="text" id="fTagIn" placeholder="e.g. Reels heavy, Educational..." onkeydown="if(event.key==='Enter'){addTag();event.preventDefault()}"><button class="btn sml" onclick="addTag()">+ Add</button></div>
+      <div class="tags-wrap" id="tagWrap"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Posting frequency</label><input type="text" id="fFreq" placeholder="e.g. Daily, 4-5x/week"></div>
+      <div class="fg"><label>Last checked</label><input type="date" id="fChk"></div>
+    </div>
+    <div class="fg"><label>Notes (patterns, hooks, what works)</label><textarea id="fNotes" placeholder="What makes this creator unique? What hook or script patterns work well?"></textarea></div>
+    <div class="mo-foot">
+      <button class="btn" onclick="closeMo('moCreator')">Cancel</button>
+      <button class="btn pri" onclick="saveCreator()"><i class="ti ti-check"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REEL -->
+<div class="mo" id="moReel">
+  <div class="modal">
+    <div class="mo-hdr"><div class="mo-title" id="moReelTitle">Add reel</div><button class="mo-x" onclick="closeMo('moReel')">×</button></div>
+    <div class="fg"><label>Topic / Title *</label><input type="text" id="rTopic" placeholder="e.g. 5 AI tools replacing interns"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Date posted</label><input type="date" id="rDate"></div>
+      <div class="fg"><label>Views</label><input type="text" id="rViews" placeholder="e.g. 500K or 1.2M"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Format</label>
+        <select id="rFormat">
+          <option value="Reel">Reel</option>
+          <option value="Carousel">Carousel</option>
+          <option value="Story">Story</option>
+          <option value="Short">YouTube Short</option>
+        </select>
+      </div>
+      <div class="fg"><label>Hook type used</label>
+        <select id="rHook">
+          <option value="">Select hook type...</option>
+          <option value="Relatable situation">Relatable situation</option>
+          <option value="Impossible claim">Impossible claim</option>
+          <option value="Direct call-out">Direct call-out</option>
+          <option value="Secret reveal">Secret reveal</option>
+          <option value="News twist">News twist</option>
+          <option value="Contrast hook">Contrast hook</option>
+          <option value="Future threat">Future threat</option>
+          <option value="Story mid-entry">Story mid-entry</option>
+          <option value="Number + promise">Number + promise</option>
+          <option value="Question hook">Question hook</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Went viral?</label>
+      <select id="rViral">
+        <option value="no">No — under 500K views</option>
+        <option value="yes">Yes — 500K+ views 🔥</option>
+      </select>
+    </div>
+    <div class="fg"><label>Notes (what made it work?)</label><textarea id="rNotes" placeholder="Why did this perform well? Hook, topic, format, timing..."></textarea></div>
+    <div class="mo-foot">
+      <button class="btn" onclick="closeMo('moReel')">Cancel</button>
+      <button class="btn pri" onclick="saveReel()"><i class="ti ti-check"></i> Save reel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-box" id="confirmBox">
+  <div class="confirm-inner">
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="btn" onclick="cancelConfirm()">Cancel</button>
+      <button class="btn danger" id="confirmOkBtn" onclick="doConfirm()"><i class="ti ti-trash"></i> Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg">Saved!</span></div>
+
+<script>
+
+// ═══════════════════════════════════════════
+// PRE-LOADED COMPETITOR DATA
+// ═══════════════════════════════════════════
+const PRELOADED = {"creators":[{"id":1,"name":"Techno Teen","handle":"@techno_teen_","followers":850000,"growth":"+25K","eng":"4.1%","avgV":"150K","category":"Tech Hacks","badge":"growing","tags":["Tech tricks","Hindi dominant","Young audience","Fast paced"],"freq":"Daily","notes":"Strong with young Indian audience. Short punchy scripts. Hidden features angle works well.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":2,"name":"Amlendra","handle":"@amlendra.in","followers":620000,"growth":"+18K","eng":"3.8%","avgV":"110K","category":"Tech Hacks","badge":"growing","tags":["Tech tips","Hindi content","Informative","Educational"],"freq":"4-5x/week","notes":"Consistent posting. Educational format. Good at breaking down complex tech simply. Calm delivery.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":3,"name":"Trickpilot","handle":"@trickpilot","followers":480000,"growth":"+12K","eng":"3.5%","avgV":"80K","category":"Tech Hacks","badge":"watch","tags":["Tricks","Hindi","Phone hacks","Short format"],"freq":"4x/week","notes":"Specializes in quick tricks. Hook usually starts with a problem statement. Good engagement on hack content.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":4,"name":"Trickblower","handle":"@trickblower","followers":390000,"growth":"+10K","eng":"3.2%","avgV":"65K","category":"Tech Hacks","badge":"watch","tags":["Tricks","Phone tips","Hindi","Short reels"],"freq":"3-4x/week","notes":"Similar niche to Trickpilot. Secret/forbidden angle used frequently. Growing but slower pace.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":5,"name":"Broo Tech","handle":"@broo_tech","followers":720000,"growth":"+22K","eng":"4.3%","avgV":"130K","category":"Tech Hacks","badge":"growing","tags":["Bro energy","Tech hacks","Hinglish","Fast cuts"],"freq":"Daily","notes":"Very casual bro energy delivery. Relatable humor works well. Fast cut editing. Good hook-to-retain ratio.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":6,"name":"Tech With Niks","handle":"@techwithniks","followers":310000,"growth":"+8K","eng":"3.6%","avgV":"55K","category":"Tech Hacks","badge":"watch","tags":["Tech tips","Hindi","Educational","Phone tricks"],"freq":"3x/week","notes":"Steady growth. Educational format. Clean presentation style. Good for simplifying complex topics.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":7,"name":"TechCM","handle":"@techcm_","followers":540000,"growth":"+15K","eng":"3.9%","avgV":"95K","category":"Tech Hacks","badge":"growing","tags":["Tech content","Hindi","Reels","Tips & tricks"],"freq":"4x/week","notes":"Growing consistently. Mix of tech news and hacks. Direct delivery style. Good hook variety.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":8,"name":"Tech Plus Gadgets","handle":"@techplusgadgets","followers":890000,"growth":"+20K","eng":"3.7%","avgV":"160K","category":"Tech Hacks","badge":"trending","tags":["Gadgets","Tech review","Hindi","Product focus"],"freq":"Daily","notes":"Strong gadget review presence. Product-focused content. Large audience. Demo-based more than script-heavy.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":9,"name":"Bawal Tech","handle":"@bawal_techh","followers":430000,"growth":"+11K","eng":"4.0%","avgV":"75K","category":"Tech Hacks","badge":"watch","tags":["Bawal energy","Hindi","Fun tech","Dramatic hooks"],"freq":"4x/week","notes":"High energy content. Fun approach to tech. Dramatic hook style. Good entertainment-led tech reference.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":10,"name":"Manoj Saru","handle":"@manojsaru","followers":1800000,"growth":"+45K","eng":"3.8%","avgV":"300K","category":"Tech Hacks","badge":"growing","tags":["How-to","Numbered steps","59 sec format","Strong CTA"],"freq":"Daily","notes":"59 seconds format signature. Numbered step delivery. Strong CTAs. Time-promise hook works massively.","checked":"2025-07-22","avatar":null,"pinned":true},{"id":11,"name":"Vaibhav Sisinty","handle":"@vaibhavsisinty","followers":950000,"growth":"+30K","eng":"5.1%","avgV":"200K","category":"AI News","badge":"viral","tags":["AI updates","Daily news","English+Hinglish","Cinematic"],"freq":"Daily","notes":"Daily AI updates format. Visual scene entry hooks strong. Very high trust factor. Cinematic feel. Best engagement rate.","checked":"2025-07-22","avatar":null,"pinned":true},{"id":12,"name":"Techie Rimo","handle":"@techie.rimo","followers":280000,"growth":"+7K","eng":"3.4%","avgV":"48K","category":"Tech Hacks","badge":"watch","tags":["Tech tips","Hindi","Phone tricks","Short format"],"freq":"3x/week","notes":"Smaller but engaged audience. Hindi-heavy content. Good for understanding tier-2 city audience patterns.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":13,"name":"Tech With Nandini","handle":"@tech_with_nandini","followers":340000,"growth":"+9K","eng":"4.2%","avgV":"60K","category":"Tech Hacks","badge":"growing","tags":["Female creator","Tech tips","Hindi","Relatable delivery"],"freq":"4x/week","notes":"Strong female tech creator. Relatable delivery. Good at connecting with female audience in tech.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":14,"name":"Nawaz Shaikh","handle":"@thenawazshaikh","followers":780000,"growth":"+15K","eng":"4.5%","avgV":"120K","category":"AI Tools","badge":"watch","tags":["AI tools","Value bombs","DM CTA","Numbered format"],"freq":"5x/week","notes":"Pure value delivery. Numbered value bombs. DM CTA gets very high engagement. Short and punchy scripts.","checked":"2025-07-22","avatar":null,"pinned":true},{"id":15,"name":"Geeky Vikas","handle":"@geekyvikas","followers":670000,"growth":"+19K","eng":"3.9%","avgV":"115K","category":"Tech Hacks","badge":"growing","tags":["Geeky content","Tech tricks","Hindi","Screen recording"],"freq":"Daily","notes":"Consistent daily poster. Geeky angle appeals to tech enthusiasts. Good mix of screen recording and talking head.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":16,"name":"Tech Sahil","handle":"@techsahil___","followers":390000,"growth":"+10K","eng":"3.6%","avgV":"68K","category":"Tech Hacks","badge":"watch","tags":["Tech tips","Hindi","Short reels","Phone hacks"],"freq":"4x/week","notes":"Steady growth. Phone hacks focus. Direct delivery. Good engagement on hidden settings type content.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":17,"name":"Tech Kishan","handle":"@techh_kishan","followers":260000,"growth":"+6K","eng":"3.5%","avgV":"42K","category":"Tech Hacks","badge":"watch","tags":["Tech tricks","Hindi","Growing creator","Phone tips"],"freq":"3x/week","notes":"Smaller creator growing steadily. Hindi-dominant content. Good reference for grassroots organic growth.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":18,"name":"Techno Craze","handle":"@techno___craze","followers":510000,"growth":"+13K","eng":"3.7%","avgV":"90K","category":"Tech Hacks","badge":"growing","tags":["Trending tech","Hindi","Fast publisher","Hype angle"],"freq":"4x/week","notes":"Good at picking trending tech topics quickly. Fast publisher when news breaks. Craze/hype angle works.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":19,"name":"Tech Iela","handle":"@tech_iela","followers":220000,"growth":"+5K","eng":"3.8%","avgV":"38K","category":"Tech Hacks","badge":"watch","tags":["Tech tips","Hindi","Female creator","Phone tricks"],"freq":"3x/week","notes":"Smaller creator with good engagement ratio. Female tech voice. Growing organically. Watch for emerging patterns.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":20,"name":"Tech Saheli","handle":"@tech_saheli","followers":290000,"growth":"+8K","eng":"4.0%","avgV":"52K","category":"Tech Hacks","badge":"growing","tags":["Female tech","Hindi","Saheli energy","Relatable tips"],"freq":"4x/week","notes":"Strong female tech creator. Saheli/friend energy in delivery. Relatable approach. Good engagement for size.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":21,"name":"Technical Skyco","handle":"@technicalskyco","followers":460000,"growth":"+12K","eng":"3.6%","avgV":"80K","category":"Tech Hacks","badge":"watch","tags":["Technical depth","Hindi","Clean hooks","Quality production"],"freq":"4x/week","notes":"Good production quality. Technical depth in content. Appeals to more advanced tech users. Clean hook structure.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":22,"name":"Trakin Tech","handle":"@trakintech","followers":4200000,"growth":"+80K","eng":"3.2%","avgV":"600K","category":"General Tech","badge":"trending","tags":["Major creator","Gadgets","Reviews","Hindi+English"],"freq":"Daily","notes":"One of India biggest tech creators. Gadget reviews dominant. Massive reach. Study for reach strategies.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":23,"name":"Ankit Ankk","handle":"@ankit_ankk","followers":380000,"growth":"+9K","eng":"3.9%","avgV":"65K","category":"Tech Hacks","badge":"watch","tags":["Tech content","Hindi","Tricks","Growing creator"],"freq":"4x/week","notes":"Steady growing creator. Good hook variety. Hindi-dominant. Consistent with trick-style content.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":24,"name":"Techburner","handle":"@techburner","followers":2500000,"growth":"+80K","eng":"4.2%","avgV":"500K","category":"General Tech","badge":"trending","tags":["Reels heavy","Entertainment","Tech hacks","Bhai energy"],"freq":"Daily","notes":"Very high energy fast cuts bhai energy. Hook always starts mid-situation. Pain point hooks work massively.","checked":"2025-07-22","avatar":null,"pinned":true},{"id":25,"name":"Techno Explorer","handle":"@techno___explorer","followers":330000,"growth":"+9K","eng":"3.7%","avgV":"57K","category":"Tech Hacks","badge":"watch","tags":["Explorer angle","Tech discovery","Hindi","Curiosity hooks"],"freq":"3-4x/week","notes":"Discovery/explorer angle in content. Good for reference on curiosity-based hooks. Steady growth.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":26,"name":"Tech Spert","handle":"@tech_spert","followers":415000,"growth":"+11K","eng":"3.8%","avgV":"72K","category":"Tech Hacks","badge":"watch","tags":["Expert positioning","Tech tips","Hindi","Authority hooks"],"freq":"4x/week","notes":"Expert positioning in content. Authority-based hooks. Good at making audience feel they learn from a pro.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":27,"name":"Techno Ruhez","handle":"@technoruhez","followers":560000,"growth":"+14K","eng":"3.9%","avgV":"98K","category":"Tech Hacks","badge":"growing","tags":["Tech content","Hindi","Fast paced","Hook variety"],"freq":"Daily","notes":"Fast-paced content delivery. Good hook variety. Growing consistently. Strong with tricks and hidden features.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":28,"name":"Tecotech","handle":"@tecotech_47","followers":620000,"growth":"+22K","eng":"3.9%","avgV":"95K","category":"Tech Hacks","badge":"growing","tags":["Hidden features","Secret angle","Android tips","Curiosity hooks"],"freq":"4x/week","notes":"Forbidden/secret angle works very well. Relatable humor mid-script. Best for curiosity-gap hook reference.","checked":"2025-07-22","avatar":null,"pinned":true},{"id":29,"name":"Tech Liyakat","handle":"@tech_liyakat","followers":245000,"growth":"+6K","eng":"3.6%","avgV":"40K","category":"Tech Hacks","badge":"watch","tags":["Tech tips","Hindi","Growing creator","Organic growth"],"freq":"3x/week","notes":"Smaller but steadily growing creator. Good reference for organic Hindi tech content. Consistent discipline.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":30,"name":"TechPlus AI","handle":"@techplus.ai","followers":520000,"growth":"+20K","eng":"4.4%","avgV":"95K","category":"AI Tools","badge":"growing","tags":["AI tools","Tech+AI blend","Hindi+English","Daily AI"],"freq":"Daily","notes":"Strong AI tools focus with tech blend. Growing fast in AI space. Good hook variety. Study for AI tool spotlight.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":31,"name":"Sahil Verma AI","handle":"@sahilverma.ai","followers":380000,"growth":"+18K","eng":"4.8%","avgV":"80K","category":"AI Tools","badge":"viral","tags":["AI focus","English dominant","Tool reveals","High engagement"],"freq":"Daily","notes":"Very high engagement for size. AI tools reveal format works well. Strong discovery hooks. One to watch closely.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":32,"name":"Raj Photo Editing","handle":"@rajphotoeditingmuchmore","followers":290000,"growth":"+10K","eng":"4.1%","avgV":"55K","category":"AI Tools","badge":"growing","tags":["AI photo editing","Visual AI","Creative tools","Hindi"],"freq":"4x/week","notes":"Niche focus on AI photo/video editing tools. Creative AI content. Good reference for visual AI tool content.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":33,"name":"Mendy AI","handle":"@mendy.ai","followers":680000,"growth":"+35K","eng":"5.3%","avgV":"150K","category":"AI Tools","badge":"viral","tags":["AI tools","Visual hooks","High quality","English+Hindi"],"freq":"Daily","notes":"Highest engagement rate in AI niche. Visual hooks exceptional — uses AI-generated video hooks extensively. Must study.","checked":"2025-07-22","avatar":null,"pinned":true},{"id":34,"name":"Neural Tech AI","handle":"@neuraltech.ai","followers":310000,"growth":"+14K","eng":"4.2%","avgV":"65K","category":"AI Tools","badge":"growing","tags":["Neural AI","Tech+AI","Hindi+English","Educational AI"],"freq":"Daily","notes":"Neural/deep tech AI focus. Growing consistently. Good production quality. Educational AI content style.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":35,"name":"Trakin AI","handle":"@trakin.ai","followers":890000,"growth":"+40K","eng":"4.0%","avgV":"175K","category":"AI Tools","badge":"trending","tags":["AI tools","Trakin brand","Hindi","Large reach"],"freq":"Daily","notes":"Extension of Trakin Tech into AI space. Large existing audience advantage. Fast AI news coverage.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":36,"name":"Techy Raj AI","handle":"@techyraj.ai","followers":250000,"growth":"+12K","eng":"4.5%","avgV":"52K","category":"AI Tools","badge":"growing","tags":["AI content","Hindi dominant","Tool spotlights","Fast growing"],"freq":"Daily","notes":"Fast growing AI creator. Good engagement for size. Hindi dominant AI content. Study early-stage AI growth patterns.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":37,"name":"Vaibhav AI","handle":"@vaibhavv.ai","followers":420000,"growth":"+22K","eng":"4.6%","avgV":"90K","category":"AI Tools","badge":"viral","tags":["AI tools","High engagement","Discovery hooks","Hinglish"],"freq":"Daily","notes":"Very high engagement. AI tools discovery format. Fast growth. Strong hook quality consistently.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":38,"name":"AI Noobs to Ninjas","handle":"@ai.noobstoninjas","followers":190000,"growth":"+9K","eng":"4.7%","avgV":"42K","category":"AI Tools","badge":"growing","tags":["Learning angle","AI beginner","Educational","Hindi+English"],"freq":"4x/week","notes":"Unique noob-to-ninja learning angle. High engagement for size. Great reference for beginner-friendly AI content.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":39,"name":"House of AI","handle":"@houseofaico","followers":340000,"growth":"+16K","eng":"4.3%","avgV":"72K","category":"AI Tools","badge":"growing","tags":["AI hub","Multiple tools","Hindi+English","Daily AI"],"freq":"Daily","notes":"House/hub positioning for AI content. Covers wide range of AI tools. Growing steadily. Good content variety reference.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":40,"name":"Poorvaa Choudhary","handle":"@poorvaachoudharyy","followers":180000,"growth":"+8K","eng":"4.5%","avgV":"35K","category":"Career Skills","badge":"growing","tags":["Career coach","Female creator","LinkedIn tips","Job search"],"freq":"4x/week","notes":"Career coach content. LinkedIn and job search tips. Good reference for P5 Career Skills pillar content style.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":41,"name":"Yournishaant","handle":"@yournishaant","followers":220000,"growth":"+10K","eng":"4.2%","avgV":"45K","category":"Career Skills","badge":"growing","tags":["Career tips","Motivation","Youth audience","Hindi"],"freq":"4x/week","notes":"Career and motivation content targeting youth. Good hook energy. Study for P5 pillar emotional journey.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":42,"name":"Viral Coder","handle":"@viral.coder","followers":310000,"growth":"+15K","eng":"4.8%","avgV":"70K","category":"Tech Hacks","badge":"growing","tags":["Coding tips","Tech+code","Hinglish","Visual demos"],"freq":"Daily","notes":"Coding tricks going viral format. Visual demo style. High engagement. Good reference for screen recording hooks.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":43,"name":"Code With Srajan","handle":"@codewithsrajan","followers":165000,"growth":"+9K","eng":"4.6%","avgV":"38K","category":"Tech Hacks","badge":"growing","tags":["Coding","Tech education","Hindi+English","Beginners"],"freq":"3-4x/week","notes":"Coding education focused. Beginner-friendly angle. Growing steadily. Good for reference on educational tech content.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":44,"name":"Saunex","handle":"@saunex_","followers":140000,"growth":"+7K","eng":"4.4%","avgV":"32K","category":"Tech Hacks","badge":"watch","tags":["Tech tips","Growing","Hindi","Niche tricks"],"freq":"3x/week","notes":"Smaller but growing creator. Niche tech tricks content. Good organic growth reference for early stage.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":45,"name":"Tricky Man Official","handle":"@trickymanofficial","followers":580000,"growth":"+16K","eng":"3.8%","avgV":"105K","category":"Tech Hacks","badge":"growing","tags":["Tricky tips","Hindi","Phone hacks","Entertainment+tech"],"freq":"Daily","notes":"Entertainment meets tech format. Tricky/clever angle in hooks. Good Hindi delivery. Study for P2 hook styles.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":46,"name":"Heena Kouaer AI","handle":"@heenakouaer.ai","followers":125000,"growth":"+8K","eng":"5.0%","avgV":"28K","category":"AI Tools","badge":"growing","tags":["AI tools","Female creator","Urdu+Hindi","Growing fast"],"freq":"4x/week","notes":"Fast growing female AI creator. Very high engagement for size. Urdu+Hindi mix. Watch closely for early viral patterns.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":47,"name":"Sana Says Build","handle":"@sanasaysbuild","followers":95000,"growth":"+6K","eng":"5.2%","avgV":"22K","category":"AI Tools","badge":"growing","tags":["Build with AI","Female founder","English dominant","Startup angle"],"freq":"3x/week","notes":"Build with AI angle. Female founder perspective. English dominant. Very high engagement for size. Niche but powerful.","checked":"2025-07-22","avatar":null,"pinned":false},{"id":48,"name":"Vee Daily","handle":"@vee_daily19","followers":110000,"growth":"+7K","eng":"4.9%","avgV":"25K","category":"AI Tools","badge":"growing","tags":["Daily AI","Consistent posting","Hindi+English","Short form"],"freq":"Daily","notes":"Daily AI content format. Very consistent posting. Growing steadily. Good reference for daily content discipline.","checked":"2025-07-22","avatar":null,"pinned":false}],"viralAlerts":[{"id":1,"creator":"Mendy AI","note":"AI visual hooks reel — 800K+ views — AI generated video hook format performing exceptionally","date":"2025-07-16"},{"id":2,"creator":"Vaibhav Sisinty","note":"OpenAI update reel — 2.1M views — news twist personal impact format","date":"2025-07-15"},{"id":3,"creator":"Techburner","note":"Free AI tool hidden feature — 900K saves — impossible claim hook","date":"2025-07-14"},{"id":4,"creator":"Sahil Verma AI","note":"5 AI tools nobody talks about — 600K views — numbered value bombs format","date":"2025-07-13"}],"inspirations":[{"id":1,"creator":"Mendy AI","type":"Visual","note":"AI generated cinematic video hook playing for first 3 seconds before talking head — instant pattern break. Must implement this approach.","tags":["Visual hook","AI video","Pattern break"],"date":"2025-07-16"},{"id":2,"creator":"Manoj Saru","type":"Hook","note":"59 seconds mein batata hoon — time promise hook creates instant low-commitment contract with viewer. They think it is a small investment to stay.","tags":["Time promise","Hook formula","Low commitment"],"date":"2025-07-15"},{"id":3,"creator":"Tecotech","type":"Script format","note":"Forbidden/risky opening then immediate reassurance — creates fear then relief in 3 seconds. Most powerful two-step emotional hook.","tags":["Forbidden angle","Fear + relief","Hook"],"date":"2025-07-14"}],"reels":[{"id":1,"cid":33,"topic":"AI visual hooks — cinematic video openers for reels","date":"2025-07-14","views":"800K","format":"Reel","hook":"Visual hook","viral":true,"notes":"AI generated 3 sec video hook before talking head — exceptional pattern break"},{"id":2,"cid":11,"topic":"OpenAI update changes everything about your job","date":"2025-07-15","views":"2.1M","format":"Reel","hook":"News twist","viral":true,"notes":"Personal impact framing — not what happened but what it means for YOU"},{"id":3,"cid":24,"topic":"Free AI tool that nobody in India is talking about","date":"2025-07-14","views":"900K","format":"Reel","hook":"Impossible claim","viral":true,"notes":"Save bait worked — 900K saves. Secret reveal format dominant"},{"id":4,"cid":31,"topic":"5 AI tools nobody talks about — all free","date":"2025-07-13","views":"600K","format":"Reel","hook":"Number + promise","viral":true,"notes":"Numbered value bombs + free angle = maximum saves"},{"id":5,"cid":10,"topic":"3 WhatsApp tricks in 59 seconds you never knew","date":"2025-07-12","views":"450K","format":"Reel","hook":"Time promise","viral":false,"notes":"Classic Manoj format — numbered + time promise"}],"qNotes":"KEY OBSERVATIONS:\n- Mendy AI visual hooks performing best in AI niche right now\n- Secret/forbidden angle consistently getting high saves across all creators\n- News + personal impact format driving highest views for Vaibhav\n- Free tool angle always works for discovery hooks\n\nTO CHECK THIS WEEK:\n- Trakin AI new format change\n- Sahil Verma AI growth spike reason\n- Mendy AI latest reel hook analysis"};
+
+// ═══════════════════════════════════════════
+// DATA & CONSTANTS
+// ═══════════════════════════════════════════
+const BDGE={
+  trending:{l:'🔥 Trending',bg:'rgba(220,38,38,.15)',c:'#EF4444'},
+  growing:{l:'📈 Growing',bg:'rgba(29,158,117,.15)',c:'#1D9E75'},
+  viral:{l:'⚡ Viral',bg:'rgba(245,158,11,.15)',c:'#F59E0B'},
+  watch:{l:'👀 Watch',bg:'rgba(123,47,190,.15)',c:'#C77DFF'},
+  inactive:{l:'💤 Inactive',bg:'rgba(100,100,100,.15)',c:'#888'},
+  none:{l:'',bg:'',c:''}
+};
+const AVC=[
+  ['rgba(123,47,190,.2)','#C77DFF'],['rgba(0,245,255,.15)','#00F5FF'],
+  ['rgba(29,158,117,.2)','#1D9E75'],['rgba(220,38,38,.15)','#EF4444'],
+  ['rgba(245,158,11,.15)','#F59E0B']
+];
+
+// ═══════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════
+let creators=JSON.parse(localStorage.getItem('qf_creators')||'null');
+let viralAlerts=JSON.parse(localStorage.getItem('qf_alerts')||'null');
+let inspirations=JSON.parse(localStorage.getItem('qf_inspo')||'null');
+let reels=JSON.parse(localStorage.getItem('qf_reels')||'null');
+let qNotes=localStorage.getItem('qf_qnotes')||'';
+
+// Load preloaded data if no local data exists
+if(!creators){creators=PRELOADED.creators;localStorage.setItem('qf_creators',JSON.stringify(creators));}
+if(!viralAlerts){viralAlerts=PRELOADED.viralAlerts;localStorage.setItem('qf_alerts',JSON.stringify(viralAlerts));}
+if(!inspirations){inspirations=PRELOADED.inspirations;localStorage.setItem('qf_inspo',JSON.stringify(inspirations));}
+if(!reels){reels=PRELOADED.reels;localStorage.setItem('qf_reels',JSON.stringify(reels));}
+if(!qNotes){qNotes=PRELOADED.qNotes;localStorage.setItem('qf_qnotes',qNotes);}
+let isLight=localStorage.getItem('qf_theme')==='light';
+let activeTab=localStorage.getItem('qf_tab')||'creators';
+let editId=null,editReelId=null,editReelCid=null;
+let tmpTags=[],tmpAv=null,tmpInsTags=[];
+let confirmCb=null;
+
+// Ensure all arrays are initialized
+if(!viralAlerts){viralAlerts=PRELOADED.viralAlerts;saveA();}
+if(!inspirations){inspirations=PRELOADED.inspirations;saveI();}
+if(!reels){reels=PRELOADED.reels;saveR();}
+
+function save(){localStorage.setItem('qf_creators',JSON.stringify(creators));updateLastUpdated();}
+function saveA(){localStorage.setItem('qf_alerts',JSON.stringify(viralAlerts));}
+function saveI(){localStorage.setItem('qf_inspo',JSON.stringify(inspirations));}
+function saveR(){localStorage.setItem('qf_reels',JSON.stringify(reels));updateLastUpdated();}
+function saveQNotes(){qNotes=document.getElementById('qnArea').value;localStorage.setItem('qf_qnotes',qNotes);toast('Notes saved!');}
+
+function updateLastUpdated(){
+  const d=new Date();
+  document.getElementById('lastUpdated').textContent='Updated: '+d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function fmt(n){
+  if(typeof n==='string'){
+    if(n.toLowerCase().endsWith('m'))return n;
+    if(n.toLowerCase().endsWith('k'))return n;
+    n=parseInt(n.replace(/[^0-9]/g,''))||0;
+  }
+  n=parseInt(n)||0;
+  if(n>=1e6)return(n/1e6).toFixed(1)+'M';
+  if(n>=1000)return Math.round(n/1000)+'K';
+  return n.toString();
+}
+function parseViews(v){
+  if(!v)return 0;
+  v=v.toString().toLowerCase().trim();
+  if(v.endsWith('m'))return parseFloat(v)*1e6;
+  if(v.endsWith('k'))return parseFloat(v)*1e3;
+  return parseFloat(v.replace(/[^0-9.]/g,''))||0;
+}
+function parseFollowers(v){
+  if(!v)return 0;
+  v=v.toString().toLowerCase().trim();
+  if(v.endsWith('m'))return parseFloat(v)*1e6;
+  if(v.endsWith('k'))return parseFloat(v)*1e3;
+  return parseInt(v.replace(/[^0-9]/g,''))||0;
+}
+function ini(n){return(n||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+function avc(n){return AVC[(n||'?').charCodeAt(0)%AVC.length];}
+function daysSince(d){if(!d)return 999;return Math.floor((Date.now()-new Date(d))/864e5);}
+function isOverdue(c){return daysSince(c.checked)>7;}
+function today(){return new Date().toISOString().split('T')[0];}
+function renderAv(c,sz=42){
+  if(c.avatar)return`<img src="${c.avatar}" alt="${c.name}">`;
+  const[bg,col]=avc(c.name);
+  return`<span style="background:${bg};color:${col};width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:${Math.round(sz*.33)}px;font-weight:600;flex-shrink:0">${ini(c.name)}</span>`;
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').style.color=type==='err'?'var(--td)':type==='warn'?'var(--tw)':'var(--tg)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ═══════════════════════════════════════════
+// CONFIRM DIALOG
+// ═══════════════════════════════════════════
+function confirm2(title,msg,cb,btnLabel='Remove'){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  document.getElementById('confirmOkBtn').textContent=btnLabel;
+  confirmCb=cb;
+  document.getElementById('confirmBox').classList.add('open');
+}
+function doConfirm(){if(confirmCb)confirmCb();document.getElementById('confirmBox').classList.remove('open');confirmCb=null;}
+function cancelConfirm(){document.getElementById('confirmBox').classList.remove('open');confirmCb=null;}
+
+// ═══════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════
+function toggleTheme(){
+  isLight=!isLight;
+  localStorage.setItem('qf_theme',isLight?'light':'dark');
+  applyTheme();
+}
+function applyTheme(){
+  document.body.classList.toggle('light',isLight);
+  const icon=document.getElementById('themeIcon');
+  icon.className=isLight?'ti ti-moon':'ti ti-sun';
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+function showTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  activeTab=id;
+  localStorage.setItem('qf_tab',id);
+  if(id==='compare'){updateCmpSelects();renderCompare();}
+  if(id==='patterns')renderPatterns();
+  if(id==='weekly')renderWeekly();
+  if(id==='calendar')renderCalendar();
+  if(id==='inspo')renderInspo();
+  if(id==='alerts')renderAlerts();
+  if(id==='reels')renderReelsTab();
+}
+
+// ═══════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════
+function updateStats(){
+  document.getElementById('sTot').textContent=creators.length;
+  document.getElementById('sTrend').textContent=creators.filter(c=>c.badge==='trending'||c.badge==='viral').length;
+  document.getElementById('sGrow').textContent=creators.filter(c=>c.badge==='growing').length;
+  document.getElementById('sReels').textContent=reels.length;
+  const od=creators.filter(isOverdue).length;
+  document.getElementById('sOver').textContent=od;
+  const bar=document.getElementById('overdueBar');
+  if(od>0){
+    bar.style.display='flex';
+    const names=creators.filter(isOverdue).map(c=>c.name).join(', ');
+    document.getElementById('overdueMsg').textContent=`${od} creator${od>1?'s':''} not checked in 7+ days: ${names} — open their card and click "Mark checked"`;
+  }else bar.style.display='none';
+}
+
+// ═══════════════════════════════════════════
+// CREATORS
+// ═══════════════════════════════════════════
+function renderCreators(){
+  const q=(document.getElementById('srchQ').value||'').toLowerCase();
+  const cat=document.getElementById('fCat').value;
+  const bdg=document.getElementById('fBdg').value;
+  const srt=document.getElementById('srtBy').value;
+
+  let list=creators.filter(c=>{
+    const ms=c.name.toLowerCase().includes(q)||c.handle.toLowerCase().includes(q);
+    const mc=cat==='all'||c.category===cat;
+    const mb=bdg==='all'||(c.badge||'none')===bdg;
+    return ms&&mc&&mb;
+  });
+
+  if(srt==='pinned')list.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(parseFollowers(b.followers)-parseFollowers(a.followers)));
+  else if(srt==='followers')list.sort((a,b)=>parseFollowers(b.followers)-parseFollowers(a.followers));
+  else if(srt==='name')list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(srt==='checked')list.sort((a,b)=>new Date(b.checked||0)-new Date(a.checked||0));
+  else if(srt==='overdue')list.sort((a,b)=>daysSince(b.checked)-daysSince(a.checked));
+
+  document.getElementById('cCnt').textContent=list.length+' creators';
+  const grid=document.getElementById('creatorGrid');
+  const empty=document.getElementById('creatorEmpty');
+
+  if(!list.length){grid.innerHTML='';empty.style.display='block';updateStats();return;}
+  empty.style.display='none';
+
+  grid.innerHTML=list.map((c,i)=>{
+    const b=BDGE[c.badge||'none'];
+    const bdgH=b.l?`<span class="bdg" style="background:${b.bg};color:${b.c}">${b.l}</span>`:'';
+    const tags=(c.tags||[]).map(t=>`<span class="cc-tag">${t}</span>`).join('');
+    const ds=daysSince(c.checked);
+    const chkColor=ds>7?'var(--td)':ds>4?'var(--tw)':'var(--tg)';
+    const chkStr=c.checked?`${ds===0?'Today':ds+'d ago'}`:'Never';
+    const crReels=reels.filter(r=>r.cid===c.id);
+    const viralCnt=crReels.filter(r=>r.viral).length;
+    return`<div class="cc${c.pinned?' pinned':''}" id="cc-${c.id}">
+      <div class="cc-main">
+        <div class="cc-rank">
+          <span>${i+1}</span>
+          <button class="pin-btn${c.pinned?' pinned':''}" onclick="togglePin(${c.id})" title="${c.pinned?'Unpin':'Pin to top'}"><i class="ti ti-pin"></i></button>
+        </div>
+        <div class="cc-av" onclick="trigAv(${c.id})" title="Click to change photo">
+          ${renderAv(c)}
+          <div class="av-ht"><i class="ti ti-camera"></i></div>
+          <input type="file" id="av-${c.id}" accept="image/*" style="display:none" onchange="inlineAv(event,${c.id})">
+        </div>
+        <div class="cc-body">
+          <div class="cc-nr">
+            <span class="cc-name">${c.name}</span>
+            <span class="cc-handle">${c.handle}</span>
+            ${bdgH}
+            ${c.pinned?'<span style="font-size:10px;color:var(--ta)">📌 Pinned</span>':''}
+          </div>
+          <div class="cc-meta">
+            <span class="cc-stat"><i class="ti ti-users"></i> ${fmt(c.followers)}</span>
+            ${c.growth?`<span class="cc-stat" style="color:var(--tg)"><i class="ti ti-trending-up"></i> ${c.growth}</span>`:''}
+            ${c.eng?`<span class="cc-stat" style="color:var(--ta)"><i class="ti ti-heart"></i> ${c.eng}</span>`:''}
+            ${c.avgV?`<span class="cc-stat" style="color:var(--tg)"><i class="ti ti-eye"></i> ~${c.avgV}</span>`:''}
+            <span class="cc-cat">${c.category}</span>
+            <span class="cc-stat" style="color:${chkColor}"><i class="ti ti-clock"></i> ${chkStr}</span>
+            ${crReels.length?`<span class="cc-stat" style="color:var(--ta)"><i class="ti ti-player-play"></i> ${crReels.length} reels · ${viralCnt} viral</span>`:''}
+          </div>
+          ${tags?`<div class="cc-tags">${tags}</div>`:''}
+          ${c.freq?`<div style="font-size:10px;color:var(--tm);margin-bottom:4px"><i class="ti ti-calendar" style="font-size:10px"></i> Posts ${c.freq}</div>`:''}
+          ${c.notes?`<div class="cc-note">${c.notes}</div>`:''}
+          <div class="cc-actions">
+            <button class="cc-btn" onclick="openEdit(${c.id})"><i class="ti ti-edit"></i> Edit</button>
+            <button class="cc-btn" onclick="markChk(${c.id})"><i class="ti ti-check"></i> Mark checked</button>
+            <button class="cc-btn" onclick="toggleReels(${c.id})"><i class="ti ti-player-play"></i> Reels (${crReels.length})</button>
+            <button class="cc-btn" onclick="openIG('${c.handle}')"><i class="ti ti-brand-instagram"></i> Instagram</button>
+            <button class="cc-btn del" onclick="delCreator(${c.id})"><i class="ti ti-trash"></i> Remove</button>
+          </div>
+        </div>
+      </div>
+      <div class="rp" id="rp-${c.id}" style="display:none">
+        <div class="rp-hdr">
+          <div class="rp-title"><i class="ti ti-player-play"></i> Reels — ${c.name}</div>
+          <button class="btn sml pri" onclick="openAddReel(${c.id})"><i class="ti ti-plus"></i> Add reel</button>
+        </div>
+        <div class="reel-list" id="rl-${c.id}"></div>
+      </div>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+function renderReelItems(cid){
+  const el=document.getElementById('rl-'+cid);
+  if(!el)return;
+  const cr=reels.filter(r=>r.cid===cid).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  if(!cr.length){el.innerHTML=`<div style="font-size:11px;color:var(--tm);padding:4px 0">No reels added yet.</div>`;return;}
+  el.innerHTML=cr.map(r=>`
+    <div class="ri">
+      <div class="ri-date">${r.date||'—'}</div>
+      <div class="ri-body">
+        <div class="ri-topic">${r.topic}</div>
+        <div class="ri-meta">
+          ${r.views?`<span class="ri-views"><i class="ti ti-eye"></i> ${r.views}</span>`:''}
+          ${r.format?`<span class="ri-fmt">${r.format}</span>`:''}
+          ${r.hook?`<span class="ri-hook">Hook: ${r.hook}</span>`:''}
+          ${r.viral?`<span class="ri-viral">🔥 Viral</span>`:''}
+          ${r.notes?`<span class="ri-hook" style="color:var(--tm)">${r.notes}</span>`:''}
+        </div>
+      </div>
+      <div class="ri-acts">
+        <button class="ri-btn" onclick="openEditReel(${r.id},${cid})" title="Edit"><i class="ti ti-edit"></i></button>
+        <button class="ri-btn del" onclick="delReel(${r.id},${cid})" title="Delete"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleReels(cid){
+  const rp=document.getElementById('rp-'+cid);
+  const open=rp.style.display==='none';
+  rp.style.display=open?'block':'none';
+  if(open)renderReelItems(cid);
+}
+
+function togglePin(id){
+  const c=creators.find(x=>x.id===id);
+  if(c){c.pinned=!c.pinned;save();renderCreators();toast(c.pinned?'Pinned to top!':'Unpinned');}
+}
+function markChk(id){
+  const c=creators.find(x=>x.id===id);
+  if(c){c.checked=today();save();renderCreators();toast('Marked as checked today!');}
+}
+function trigAv(id){document.getElementById('av-'+id).click();}
+function inlineAv(e,id){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=x=>{const c=creators.find(c=>c.id===id);if(c){c.avatar=x.target.result;save();renderCreators();toast('Photo updated!');}};
+  r.readAsDataURL(f);
+}
+function openIG(handle){window.open('https://instagram.com/'+handle.replace('@',''),'_blank');}
+function delCreator(id){
+  const c=creators.find(x=>x.id===id);
+  confirm2('Remove competitor','Remove '+c.name+' and all their tracked reels? This cannot be undone.',()=>{
+    creators=creators.filter(x=>x.id!==id);
+    reels=reels.filter(r=>r.cid!==id);
+    save();saveR();renderCreators();updateCmpSelects();toast('Removed');
+  });
+}
+
+// ═══════════════════════════════════════════
+// CREATOR MODAL
+// ═══════════════════════════════════════════
+function openAdd(){
+  editId=null;tmpTags=[];tmpAv=null;
+  document.getElementById('moTitle').textContent='Add competitor';
+  ['fName','fHandle','fFW','fGrowth','fEng','fAvgV','fNotes','fFreq'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fCat2').value='AI Tools';
+  document.getElementById('fBdg2').value='none';
+  document.getElementById('fChk').value=today();
+  document.getElementById('fTagIn').value='';
+  document.getElementById('avIn').value='';
+  renderTags();refreshAvPrev();
+  document.getElementById('moCreator').classList.add('open');
+}
+function openEdit(id){
+  const c=creators.find(x=>x.id===id);if(!c)return;
+  editId=id;tmpTags=[...(c.tags||[])];tmpAv=c.avatar||null;
+  document.getElementById('moTitle').textContent='Edit — '+c.name;
+  document.getElementById('fName').value=c.name;
+  document.getElementById('fHandle').value=c.handle;
+  document.getElementById('fFW').value=c.followers||'';
+  document.getElementById('fGrowth').value=c.growth||'';
+  document.getElementById('fEng').value=c.eng||'';
+  document.getElementById('fAvgV').value=c.avgV||'';
+  document.getElementById('fCat2').value=c.category;
+  document.getElementById('fBdg2').value=c.badge||'none';
+  document.getElementById('fNotes').value=c.notes||'';
+  document.getElementById('fFreq').value=c.freq||'';
+  document.getElementById('fChk').value=c.checked||'';
+  document.getElementById('fTagIn').value='';
+  document.getElementById('avIn').value='';
+  renderTags();refreshAvPrev();
+  document.getElementById('moCreator').classList.add('open');
+}
+function closeMo(id){document.getElementById(id).classList.remove('open');}
+function refreshAvPrev(){
+  const prev=document.getElementById('avPrev');
+  if(tmpAv){prev.innerHTML=`<img src="${tmpAv}" style="width:56px;height:56px;border-radius:50%;object-fit:cover">`;return;}
+  const name=document.getElementById('fName').value||'?';
+  const[bg,col]=avc(name);
+  prev.innerHTML=`<span style="background:${bg};color:${col};width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:18px;font-weight:600">${ini(name)}</span>`;
+}
+function handleAv(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=x=>{tmpAv=x.target.result;refreshAvPrev();};r.readAsDataURL(f);
+}
+function addTag(){
+  const v=document.getElementById('fTagIn').value.trim();
+  if(!v||tmpTags.includes(v))return;
+  tmpTags.push(v);document.getElementById('fTagIn').value='';renderTags();
+}
+function rmTag(t){tmpTags=tmpTags.filter(x=>x!==t);renderTags();}
+function renderTags(){
+  document.getElementById('tagWrap').innerHTML=tmpTags.map(t=>`<div class="tchip">${t}<button onclick="rmTag('${t.replace(/'/g,"\\'")}')">×</button></div>`).join('');
+}
+function saveCreator(){
+  const name=document.getElementById('fName').value.trim();
+  const handle=document.getElementById('fHandle').value.trim();
+  if(!name){document.getElementById('fName').classList.add('err');toast('Creator name is required','err');return;}
+  document.getElementById('fName').classList.remove('err');
+  // Duplicate check
+  if(!editId){
+    const h=handle.startsWith('@')?handle:'@'+handle;
+    if(creators.find(c=>c.handle.toLowerCase()===h.toLowerCase())){toast('This handle already exists!','warn');return;}
+  }
+  const data={
+    name,handle:handle.startsWith('@')?handle:'@'+handle,
+    followers:document.getElementById('fFW').value.trim()||0,
+    growth:document.getElementById('fGrowth').value.trim(),
+    eng:document.getElementById('fEng').value.trim(),
+    avgV:document.getElementById('fAvgV').value.trim(),
+    category:document.getElementById('fCat2').value,
+    badge:document.getElementById('fBdg2').value,
+    notes:document.getElementById('fNotes').value.trim(),
+    freq:document.getElementById('fFreq').value.trim(),
+    checked:document.getElementById('fChk').value,
+    tags:[...tmpTags],avatar:tmpAv
+  };
+  if(editId){
+    const i=creators.findIndex(c=>c.id===editId);
+    if(i>-1)creators[i]={...creators[i],...data};
+    toast('Competitor updated!');
+  }else{
+    creators.push({id:Date.now(),pinned:false,...data});
+    toast('Competitor added!');
+  }
+  save();closeMo('moCreator');renderCreators();updateCmpSelects();updateReelFilter();
+}
+
+// ═══════════════════════════════════════════
+// REEL MODAL
+// ═══════════════════════════════════════════
+function openAddReel(cid){
+  editReelId=null;editReelCid=cid;
+  const c=creators.find(x=>x.id===cid);
+  document.getElementById('moReelTitle').textContent='Add reel — '+(c?c.name:'');
+  ['rTopic','rViews','rNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rDate').value=today();
+  document.getElementById('rFormat').value='Reel';
+  document.getElementById('rHook').value='';
+  document.getElementById('rViral').value='no';
+  document.getElementById('moReel').classList.add('open');
+}
+function openEditReel(rid,cid){
+  const r=reels.find(x=>x.id===rid);if(!r)return;
+  editReelId=rid;editReelCid=cid;
+  const c=creators.find(x=>x.id===cid);
+  document.getElementById('moReelTitle').textContent='Edit reel — '+(c?c.name:'');
+  document.getElementById('rTopic').value=r.topic||'';
+  document.getElementById('rDate').value=r.date||today();
+  document.getElementById('rViews').value=r.views||'';
+  document.getElementById('rFormat').value=r.format||'Reel';
+  document.getElementById('rHook').value=r.hook||'';
+  document.getElementById('rViral').value=r.viral?'yes':'no';
+  document.getElementById('rNotes').value=r.notes||'';
+  document.getElementById('moReel').classList.add('open');
+}
+function saveReel(){
+  const topic=document.getElementById('rTopic').value.trim();
+  if(!topic){document.getElementById('rTopic').classList.add('err');toast('Topic is required','err');return;}
+  document.getElementById('rTopic').classList.remove('err');
+  const data={
+    cid:editReelCid,topic,
+    date:document.getElementById('rDate').value,
+    views:document.getElementById('rViews').value.trim(),
+    format:document.getElementById('rFormat').value,
+    hook:document.getElementById('rHook').value,
+    viral:document.getElementById('rViral').value==='yes',
+    notes:document.getElementById('rNotes').value.trim()
+  };
+  if(editReelId){
+    const i=reels.findIndex(r=>r.id===editReelId);
+    if(i>-1)reels[i]={...reels[i],...data};
+    toast('Reel updated!');
+  }else{
+    reels.push({id:Date.now(),...data});
+    toast('Reel added!');
+  }
+  saveR();closeMo('moReel');renderReelItems(editReelCid);updateStats();renderCreators();
+}
+function delReel(rid,cid){
+  confirm2('Remove reel','Remove this reel from tracking?',()=>{
+    reels=reels.filter(r=>r.id!==rid);
+    saveR();renderReelItems(cid);updateStats();renderCreators();toast('Reel removed');
+  });
+}
+
+// ═══════════════════════════════════════════
+// REELS TAB
+// ═══════════════════════════════════════════
+function updateReelFilter(){
+  const sel=document.getElementById('rFiltCr');
+  const cur=sel.value;
+  sel.innerHTML='<option value="all">All creators</option>'+creators.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  sel.value=cur;
+}
+function renderReelsTab(){
+  const cFilter=document.getElementById('rFiltCr').value;
+  const vFilter=document.getElementById('rFiltV').value;
+  const q=(document.getElementById('rSrch').value||'').toLowerCase();
+  const srt=document.getElementById('rSort').value;
+
+  let list=reels.filter(r=>{
+    const mc=cFilter==='all'||r.cid===parseInt(cFilter);
+    const mv=vFilter==='all'||(vFilter==='yes'?r.viral:!r.viral);
+    const ms=!q||r.topic.toLowerCase().includes(q)||(r.notes||'').toLowerCase().includes(q);
+    return mc&&mv&&ms;
+  });
+  if(srt==='date')list.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  else if(srt==='views')list.sort((a,b)=>parseViews(b.views)-parseViews(a.views));
+
+  const grid=document.getElementById('reelsGrid');
+  const empty=document.getElementById('reelsEmpty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+
+  grid.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px">`+list.map(r=>{
+    const c=creators.find(x=>x.cid===r.cid||x.id===r.cid);
+    return`<div class="ri" style="background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:9px 12px">
+      <div class="ri-date">${r.date||'—'}</div>
+      <div class="ri-body">
+        <div style="font-size:10px;color:var(--ta);margin-bottom:2px">${c?c.name:''}</div>
+        <div class="ri-topic">${r.topic}</div>
+        <div class="ri-meta">
+          ${r.views?`<span class="ri-views"><i class="ti ti-eye"></i> ${r.views}</span>`:''}
+          ${r.format?`<span class="ri-fmt">${r.format}</span>`:''}
+          ${r.hook?`<span class="ri-hook">Hook: ${r.hook}</span>`:''}
+          ${r.viral?`<span class="ri-viral">🔥 Viral</span>`:''}
+          ${r.notes?`<span class="ri-hook" style="color:var(--tm)">${r.notes}</span>`:''}
+        </div>
+      </div>
+      <div class="ri-acts">
+        <button class="ri-btn" onclick="openEditReel(${r.id},${r.cid})" title="Edit"><i class="ti ti-edit"></i></button>
+        <button class="ri-btn del" onclick="delReel(${r.id},${r.cid})" title="Delete"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+// ═══════════════════════════════════════════
+// COMPARE
+// ═══════════════════════════════════════════
+function updateCompareSelects(){updateCmpSelects();}
+function updateCmpSelects(){
+  ['cmp1','cmp2'].forEach(id=>{
+    const sel=document.getElementById(id);
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Select creator...</option>'+creators.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    if(cur)sel.value=cur;
+  });
+}
+function renderCompare(){
+  const id1=parseInt(document.getElementById('cmp1').value);
+  const id2=parseInt(document.getElementById('cmp2').value);
+  const c1=creators.find(c=>c.id===id1);
+  const c2=creators.find(c=>c.id===id2);
+  renderCmpCol('cmpA',c1);
+  renderCmpCol('cmpB',c2);
+  const res=document.getElementById('cmpResult');
+  if(c1&&c2){
+    res.style.display='block';
+    const r1=reels.filter(r=>r.cid===c1.id),r2=reels.filter(r=>r.cid===c2.id);
+    const v1=r1.filter(r=>r.viral).length,v2=r2.filter(r=>r.viral).length;
+    const fw1=parseFollowers(c1.followers),fw2=parseFollowers(c2.followers);
+    const rows=[
+      ['Followers',fmt(fw1),fmt(fw2),fw1>fw2?0:fw2>fw1?1:-1],
+      ['Growth this month',c1.growth||'N/A',c2.growth||'N/A',-1],
+      ['Engagement rate',c1.eng||'N/A',c2.eng||'N/A',-1],
+      ['Avg views/reel',c1.avgV||'N/A',c2.avgV||'N/A',-1],
+      ['Reels tracked',r1.length,r2.length,r1.length>r2.length?0:r2.length>r1.length?1:-1],
+      ['Viral reels',v1,v2,v1>v2?0:v2>v1?1:-1],
+      ['Category',c1.category,c2.category,-1],
+      ['Posts',c1.freq||'N/A',c2.freq||'N/A',-1],
+      ['Badge',BDGE[c1.badge||'none'].l||'None',BDGE[c2.badge||'none'].l||'None',-1]
+    ];
+    document.getElementById('cmpContent').innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">`+
+      rows.map(([l,v1,v2,w])=>`<div style="background:var(--s1);border:0.5px solid var(--bd);border-radius:var(--r);padding:8px 10px">
+        <div style="font-size:10px;color:var(--tm);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em">${l}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px">
+          <span style="font-size:12px;font-weight:600;color:${w===0?'var(--tg)':'var(--tp)'}">${v1}</span>
+          <span style="font-size:10px;color:var(--tm)">vs</span>
+          <span style="font-size:12px;font-weight:600;color:${w===1?'var(--tg)':'var(--tp)'}">${v2}</span>
+        </div>
+      </div>`).join('')+'</div>';
+  }else res.style.display='none';
+}
+function renderCmpCol(elId,c){
+  const el=document.getElementById(elId);
+  if(!c){el.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-user" style="font-size:24px"></i><div class="empty-s">Select a creator</div></div>';return;}
+  const cr=reels.filter(r=>r.cid===c.id);
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+    <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:1.5px solid var(--bd);flex-shrink:0">${renderAv(c,40)}</div>
+    <div><div style="font-size:13px;font-weight:600;color:var(--tp)">${c.name}</div><div style="font-size:11px;color:var(--ta)">${c.handle}</div></div>
+  </div>
+  ${cr.length?`<div style="font-size:11px;color:var(--ts);margin-bottom:8px"><span style="color:var(--ta);font-weight:600">${cr.filter(r=>r.viral).length}</span> viral reels out of <span style="font-weight:600">${cr.length}</span> tracked</div>`:''}
+  ${c.notes?`<div style="font-size:11px;color:var(--ts);background:var(--s1);padding:7px 9px;border-radius:var(--r);line-height:1.5;border-left:2px solid var(--bda)">${c.notes}</div>`:''}`;
+}
+
+// ═══════════════════════════════════════════
+// PATTERNS
+// ═══════════════════════════════════════════
+function renderPatterns(){
+  const catC={},hookC={},fmtC={};
+  creators.forEach(c=>{catC[c.category]=(catC[c.category]||0)+1;});
+  reels.forEach(r=>{
+    if(r.hook)hookC[r.hook]=(hookC[r.hook]||0)+1;
+    if(r.format)fmtC[r.format]=(fmtC[r.format]||0)+1;
+  });
+  const topCat=Object.entries(catC).sort((a,b)=>b[1]-a[1]);
+  const topHook=Object.entries(hookC).sort((a,b)=>b[1]-a[1]);
+  const topFmt=Object.entries(fmtC).sort((a,b)=>b[1]-a[1]);
+  const max=(arr)=>arr[0]?.[1]||1;
+
+  function patCard(title,items,maxVal){
+    if(!items.length)return`<div class="pat-card"><div class="pat-title">${title}</div><div style="font-size:11px;color:var(--tm)">No data yet</div></div>`;
+    return`<div class="pat-card"><div class="pat-title">${title}</div>${items.slice(0,6).map(([k,v])=>`
+      <div class="pat-item"><span class="pat-label">${k}</span><span class="pat-val">${v}</span>
+      <div class="pat-bar-bg"><div class="pat-bar" style="width:${Math.round(v/maxVal*100)}%"></div></div></div>`).join('')}</div>`;
+  }
+  document.getElementById('patGrid').innerHTML=patCard('Creators by category',topCat,max(topCat))+patCard('Top hook types used',topHook,max(topHook))+patCard('Content formats',topFmt,max(topFmt));
+
+  const topViral=reels.filter(r=>r.viral).sort((a,b)=>parseViews(b.views)-parseViews(a.views)).slice(0,5);
+  const tvEl=document.getElementById('topViralReels');
+  tvEl.innerHTML=topViral.length?`<div style="display:flex;flex-direction:column;gap:6px">`+topViral.map(r=>{
+    const c=creators.find(x=>x.id===r.cid);
+    return`<div class="ri" style="background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:8px 11px">
+      <div class="ri-date">${r.date||''}</div>
+      <div class="ri-body">
+        <div style="font-size:10px;color:var(--ta);margin-bottom:2px">${c?c.name:''}</div>
+        <div class="ri-topic">${r.topic}</div>
+        <div class="ri-meta">${r.views?`<span class="ri-views"><i class="ti ti-eye"></i> ${r.views}</span>`:''} ${r.hook?`<span class="ri-hook">Hook: ${r.hook}</span>`:''}<span class="ri-viral">🔥 Viral</span></div>
+      </div></div>`;
+  }).join('')+'</div>':`<div style="font-size:12px;color:var(--tm)">No viral reels tracked yet.</div>`;
+
+  renderGrowthBars();
+}
+
+
+// ═══════════════════════════════════════════
+// GROWTH BARS ALIAS
+// ═══════════════════════════════════════════
+function renderGrowthBars(){
+  renderGrowthBars();
+}
+
+// ═══════════════════════════════════════════
+// WEEKLY SUMMARY
+// ═══════════════════════════════════════════
+function renderWeekly(){
+  const now=new Date();
+  const weekAgo=new Date(now-7*864e5);
+  const weekReels=reels.filter(r=>r.date&&new Date(r.date)>=weekAgo);
+  const viralWk=weekReels.filter(r=>r.viral);
+  const hookWk={};
+  weekReels.forEach(r=>{if(r.hook)hookWk[r.hook]=(hookWk[r.hook]||0)+1;});
+  const topHk=Object.entries(hookWk).sort((a,b)=>b[1]-a[1])[0];
+
+  document.getElementById('weekSum').innerHTML=[
+    {n:weekReels.length,l:'Reels this week'},
+    {n:viralWk.length,l:'Went viral 🔥'},
+    {n:creators.filter(isOverdue).length,l:'Need checking',col:'var(--tw)'},
+    {n:viralAlerts.filter(a=>a.date&&new Date(a.date)>=weekAgo).length,l:'New viral alerts'}
+  ].map(s=>`<div class="ws-card"><div class="ws-n" style="color:${s.col||'var(--tp)'}">${s.n}</div><div class="ws-l">${s.l}</div></div>`).join('');
+
+  const wrEl=document.getElementById('weekReels');
+  wrEl.innerHTML=weekReels.length?`<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:1rem">`+weekReels.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>{
+    const c=creators.find(x=>x.id===r.cid);
+    return`<div class="ri" style="background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:7px 10px">
+      <div class="ri-date">${r.date||''}</div>
+      <div class="ri-body"><div style="font-size:10px;color:var(--ta);margin-bottom:1px">${c?c.name:''}</div>
+      <div class="ri-topic">${r.topic}</div>
+      <div class="ri-meta">${r.views?`<span class="ri-views"><i class="ti ti-eye"></i> ${r.views}</span>`:''} ${r.viral?'<span class="ri-viral">🔥 Viral</span>':''}</div></div></div>`;
+  }).join('')+'</div>':`<div style="font-size:12px;color:var(--tm);margin-bottom:1rem">No reels tracked this week.</div>`;
+
+  document.getElementById('postTimes').innerHTML=[
+    {t:'Morning (6–10 AM)',pct:15,n:'Low audience activity'},
+    {t:'Afternoon (12–3 PM)',pct:35,n:'Students + lunch scrolling'},
+    {t:'Evening (6–9 PM)',pct:90,n:'🔥 Peak Indian audience time'},
+    {t:'Night (9–11 PM)',pct:65,n:'High engagement, second best'}
+  ].map(x=>`<div class="ws-card" style="padding:.85rem">
+    <div style="font-size:11px;color:var(--ts);margin-bottom:5px">${x.t}</div>
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+      <div style="flex:1;height:6px;background:var(--s1);border-radius:3px"><div style="height:6px;border-radius:3px;background:var(--fa);width:${x.pct}%"></div></div>
+      <span style="font-size:11px;font-weight:600;color:var(--ta)">${x.pct}%</span>
+    </div>
+    <div style="font-size:10px;color:var(--tm)">${x.n}</div>
+  </div>`).join('');
+
+  document.getElementById('qnArea').value=qNotes;
+}
+
+// ═══════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════
+function renderCalendar(){
+  const now=new Date();
+  const year=now.getFullYear(),month=now.getMonth();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const firstDay=new Date(year,month,1).getDay();
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const mName=now.toLocaleString('default',{month:'long'});
+  let html=`<div style="font-size:13px;font-weight:600;color:var(--tp);margin-bottom:8px">${mName} ${year}</div>`;
+  html+=`<div class="cal-grid">${days.map(d=>`<div class="cal-hc">${d}</div>`).join('')}`;
+  for(let i=0;i<firstDay;i++)html+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dr=reels.filter(r=>r.date===ds);
+    const isToday=d===now.getDate();
+    html+=`<div class="cal-cell${isToday?' today':''}${dr.length?' has-post':''}">
+      <div class="cal-day" style="color:${isToday?'var(--ta)':'var(--tm)'};font-weight:${isToday?'600':'400'}">${d}</div>
+      ${dr.slice(0,2).map(r=>{const c=creators.find(x=>x.id===r.cid);return`<div class="cal-post" title="${r.topic}">${c?c.name.split(' ')[0]:'?'}: ${r.topic.substring(0,12)}…</div>`;}).join('')}
+      ${dr.length>2?`<div style="font-size:9px;color:var(--tm)">+${dr.length-2} more</div>`:''}
+    </div>`;
+  }
+  html+='</div>';
+  document.getElementById('calGrid').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// INSPIRATION
+// ═══════════════════════════════════════════
+function addInsTag(){
+  const v=document.getElementById('insTagIn').value.trim();
+  if(!v||tmpInsTags.includes(v))return;
+  tmpInsTags.push(v);document.getElementById('insTagIn').value='';renderInsTags();
+}
+function renderInsTags(){
+  document.getElementById('insTagsWrap').innerHTML=tmpInsTags.map(t=>`<div class="tchip">${t}<button onclick="rmInsTag('${t.replace(/'/g,"\\'")}')">×</button></div>`).join('');
+}
+function rmInsTag(t){tmpInsTags=tmpInsTags.filter(x=>x!==t);renderInsTags();}
+function saveInspiration(){
+  const creator=document.getElementById('insCreator').value.trim();
+  const note=document.getElementById('insNote').value.trim();
+  if(!note){toast('Note is required','err');return;}
+  inspirations.unshift({id:Date.now(),creator,type:document.getElementById('insType').value,note,tags:[...tmpInsTags],date:today()});
+  saveI();
+  document.getElementById('insCreator').value='';
+  document.getElementById('insNote').value='';
+  tmpInsTags=[];renderInsTags();
+  renderInspo();toast('Inspiration saved!');
+}
+function renderInspo(){
+  const grid=document.getElementById('insGrid');
+  const empty=document.getElementById('insEmpty');
+  document.getElementById('insCnt').textContent=inspirations.length;
+  if(!inspirations.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=inspirations.map(ins=>`
+    <div class="ins-card">
+      <div class="ins-top">
+        <div><div class="ins-creator">${ins.creator||'Unknown'}</div><div class="ins-date">${ins.date||''}</div></div>
+        <button class="btn ghost sml" onclick="delInspo(${ins.id})"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="ins-type">${ins.type}</div>
+      <div class="ins-note">${ins.note}</div>
+      ${ins.tags&&ins.tags.length?`<div class="ins-tags">${ins.tags.map(t=>`<span class="ins-tag">${t}</span>`).join('')}</div>`:''}
+    </div>`).join('');
+}
+function delInspo(id){
+  confirm2('Remove inspiration','Remove this saved inspiration?',()=>{
+    inspirations=inspirations.filter(i=>i.id!==id);saveI();renderInspo();toast('Removed');
+  });
+}
+
+// ═══════════════════════════════════════════
+// VIRAL ALERTS
+// ═══════════════════════════════════════════
+function toggleVA(){
+  const el=document.getElementById('vaAddRow');
+  el.style.display=el.style.display==='flex'?'none':'flex';
+}
+function cancelVA(){document.getElementById('vaAddRow').style.display='none';document.getElementById('vaCreator').value='';document.getElementById('vaNote').value='';}
+function saveVA(){
+  const cr=document.getElementById('vaCreator').value.trim();
+  const note=document.getElementById('vaNote').value.trim();
+  if(!cr||!note){toast('Creator and note required','err');return;}
+  viralAlerts.unshift({id:Date.now(),creator:cr,note,date:today()});
+  saveA();cancelVA();renderAlerts();updateStats();toast('Alert added!');
+}
+function renderAlerts(){
+  const active=viralAlerts.slice(0,3);
+  const history=viralAlerts.slice(3);
+  const activeEl=document.getElementById('vaActive');
+  const histEl=document.getElementById('vaHistory');
+  activeEl.innerHTML=active.length?active.map(a=>`
+    <div class="va-item"><div class="va-cr">${a.creator}</div><div class="va-note">${a.note}</div><div class="va-date">${a.date||''}</div><button class="va-del" onclick="delAlert(${a.id})"><i class="ti ti-x"></i></button></div>`).join('')
+    :`<div style="font-size:11px;color:var(--tm);padding:3px 0">No active alerts yet. Add when you spot a competitor viral reel.</div>`;
+  histEl.innerHTML=history.length?`<div style="display:flex;flex-direction:column;gap:4px;opacity:.7">`+history.map(a=>`
+    <div class="va-item"><div class="va-cr">${a.creator}</div><div class="va-note">${a.note}</div><div class="va-date">${a.date||''}</div><button class="va-del" onclick="delAlert(${a.id})"><i class="ti ti-x"></i></button></div>`).join('')+'</div>':'';
+}
+function delAlert(id){viralAlerts=viralAlerts.filter(a=>a.id!==id);saveA();renderAlerts();updateStats();}
+
+// ═══════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════
+function exportCSV(){
+  const hdrs=['Rank','Name','Handle','Followers','Growth','Engagement','Avg Views','Category','Badge','Posts/Week','Pinned','Tags','Notes','Reels Tracked','Viral Reels','Last Checked'];
+  const sorted=[...creators].sort((a,b)=>parseFollowers(b.followers)-parseFollowers(a.followers));
+  const rows=sorted.map((c,i)=>{
+    const cr=reels.filter(r=>r.cid===c.id);
+    return[i+1,c.name,c.handle,c.followers||0,c.growth||'',c.eng||'',c.avgV||'',c.category,BDGE[c.badge||'none'].l||'None',c.freq||'',c.pinned?'Yes':'No',(c.tags||[]).join('|'),(c.notes||'').replace(/,/g,';').replace(/\n/g,' '),cr.length,cr.filter(r=>r.viral).length,c.checked||''].map(v=>`"${v}"`);
+  });
+  dl(new Blob([[hdrs,...rows].map(r=>r.join(',')).join('\n')],{type:'text/csv'}),'qurion_competitors_'+today()+'.csv');
+  toast('CSV exported!');
+}
+function exportJSON(){
+  const data={version:'final',exported:new Date().toISOString(),creators,viralAlerts,inspirations,reels,qNotes};
+  dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'qurion_backup_'+today()+'.json');
+  toast('Backup downloaded!');
+}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=x=>{
+    try{
+      const d=JSON.parse(x.target.result);
+      if(d.creators){creators=d.creators;save();}
+      if(d.viralAlerts){viralAlerts=d.viralAlerts;saveA();}
+      if(d.inspirations){inspirations=d.inspirations;saveI();}
+      if(d.reels){reels=d.reels;saveR();}
+      if(d.qNotes){qNotes=d.qNotes;localStorage.setItem('qf_qnotes',qNotes);}
+      renderCreators();renderAlerts();renderInspo();updateStats();updateCmpSelects();updateReelFilter();
+      toast('Data restored successfully!');
+    }catch{toast('Invalid backup file','err');}
+  };
+  r.readAsText(f);
+  e.target.value='';
+}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+
+// ═══════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  if(e.key==='Escape'){
+    document.querySelectorAll('.mo.open').forEach(m=>m.classList.remove('open'));
+    document.getElementById('confirmBox').classList.remove('open');
+  }
+  if(e.key==='n'||e.key==='N')openAdd();
+});
+
+// Close modals on backdrop click
+document.querySelectorAll('.mo').forEach(mo=>{
+  mo.addEventListener('click',function(e){if(e.target===this)closeMo(this.id);});
+});
+
+
+// ═══════════════════════════════════════════
+// RESET TO DEFAULT
+// ═══════════════════════════════════════════
+function resetToDefault(){
+  confirm2(
+    'Reset to default data?',
+    'Ye tumhara saara current data (creators, reels, alerts, inspirations) delete karke 48 pre-loaded creators se replace kar dega. Pehle Backup lo agar current data save karna hai.',
+    ()=>{
+      localStorage.removeItem('qf_creators');
+      localStorage.removeItem('qf_alerts');
+      localStorage.removeItem('qf_inspo');
+      localStorage.removeItem('qf_reels');
+      localStorage.removeItem('qf_qnotes');
+      creators=PRELOADED.creators;
+      viralAlerts=PRELOADED.viralAlerts;
+      inspirations=PRELOADED.inspirations;
+      reels=PRELOADED.reels;
+      qNotes=PRELOADED.qNotes||'';
+      save();saveA();saveI();saveR();
+      localStorage.setItem('qf_qnotes',qNotes);
+      renderCreators();
+      renderAlerts();
+      renderInspo();
+      updateStats();
+      updateCmpSelects();
+      updateReelFilter();
+      toast('Reset complete — 48 creators loaded!');
+    },
+    'Reset now'
+  );
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.getElementById('fName').addEventListener('input',refreshAvPrev);
+applyTheme();
+updateLastUpdated();
+
+// Restore active tab
+const tabBtns=document.querySelectorAll('.tab');
+tabBtns.forEach(btn=>{
+  const onclick=btn.getAttribute('onclick')||'';
+  const match=onclick.match(/showTab\('(\w+)'/);
+  if(match&&match[1]===activeTab){
+    showTab(activeTab,btn);
+  }
+});
+
+// FORCE RESET if localStorage has old data (less than 10 creators)
+if(creators.length < 10){
+  console.log('Old data detected — loading 48 creators from PRELOADED');
+  creators=PRELOADED.creators;
+  viralAlerts=PRELOADED.viralAlerts;
+  inspirations=PRELOADED.inspirations;
+  reels=PRELOADED.reels;
+  save();saveA();saveI();saveR();
+}
+renderCreators();
+updateCmpSelects();
+updateReelFilter();
+renderAlerts();
+renderInspo();
+</script>
+</body>
+</html>
