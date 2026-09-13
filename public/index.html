@@ -806,7 +806,10 @@ function renderCreators() {
   const srt = document.getElementById('srtBy').value;
 
   let list = creators.filter(c => {
-    const ms = c.name.toLowerCase().includes(q) || c.handle.toLowerCase().includes(q);
+    if (!c || !c.name) return false;
+    const nameStr = (c.name || '').toLowerCase();
+    const handleStr = (c.handle || '').toLowerCase();
+    const ms = nameStr.includes(q) || handleStr.includes(q);
     const mc = cat === 'all' || c.category === cat;
     const mb = bdg === 'all' || (c.badge || 'none') === bdg;
     return ms && mc && mb;
@@ -814,7 +817,7 @@ function renderCreators() {
 
   if (srt === 'pinned') list.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (parseFollowers(b.followers) - parseFollowers(a.followers)));
   else if (srt === 'followers') list.sort((a, b) => parseFollowers(b.followers) - parseFollowers(a.followers));
-  else if (srt === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
+  else if (srt === 'name') list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   else if (srt === 'checked') list.sort((a, b) => new Date(b.checked || 0) - new Date(a.checked || 0));
   else if (srt === 'overdue') list.sort((a, b) => daysSince(b.checked) - daysSince(a.checked));
 
@@ -1067,7 +1070,7 @@ async function saveCreator() {
   // Duplicate check
   if (!editId) {
     const h = handle.startsWith('@') ? handle : '@' + handle;
-    if (creators.find(c => c.handle.toLowerCase() === h.toLowerCase())) { toast('This handle already exists!', 'warn'); return; }
+    if (creators.find(c => c && c.handle && c.handle.toLowerCase() === h.toLowerCase())) { toast('This handle already exists!', 'warn'); return; }
   }
 
   const saveBtn = document.getElementById('saveCreatorBtn');
@@ -1103,8 +1106,12 @@ async function saveCreator() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to update competitor (${res.status})`);
+      }
       const updated = await res.json();
-      const i = creators.findIndex(c => c.id === editId);
+      const i = creators.findIndex(c => c && c.id === editId);
       if (i > -1) creators[i] = updated;
       toast('Competitor updated!');
     } else {
@@ -1113,6 +1120,10 @@ async function saveCreator() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to add competitor (${res.status})`);
+      }
       const created = await res.json();
       creators.push(created);
       toast('Competitor added!');
@@ -1184,8 +1195,12 @@ async function saveReel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to update reel (${res.status})`);
+      }
       const updated = await res.json();
-      const i = reels.findIndex(r => r.id === editReelId);
+      const i = reels.findIndex(r => r && r.id === editReelId);
       if (i > -1) reels[i] = updated;
       toast('Reel updated!');
     } else {
@@ -1194,6 +1209,10 @@ async function saveReel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to add reel (${res.status})`);
+      }
       const created = await res.json();
       reels.push(created);
       toast('Reel added!');
@@ -1203,7 +1222,7 @@ async function saveReel() {
     updateStats();
     renderCreators();
   } catch (err) {
-    toast('Failed to save reel', 'err');
+    toast(err.message || 'Failed to save reel', 'err');
   }
 }
 
@@ -1341,10 +1360,12 @@ function renderCmpCol(elId, c) {
 // ═══════════════════════════════════════════
 function renderPatterns() {
   const catC = {}, hookC = {}, fmtC = {};
-  creators.forEach(c => { catC[c.category] = (catC[c.category] || 0) + 1; });
+  creators.forEach(c => {
+    if (c && c.category) catC[c.category] = (catC[c.category] || 0) + 1;
+  });
   reels.forEach(r => {
-    if (r.hook) hookC[r.hook] = (hookC[r.hook] || 0) + 1;
-    if (r.format) fmtC[r.format] = (fmtC[r.format] || 0) + 1;
+    if (r && r.hook) hookC[r.hook] = (hookC[r.hook] || 0) + 1;
+    if (r && r.format) fmtC[r.format] = (fmtC[r.format] || 0) + 1;
   });
   const topCat = Object.entries(catC).sort((a, b) => b[1] - a[1]);
   const topHook = Object.entries(hookC).sort((a, b) => b[1] - a[1]);
@@ -1359,10 +1380,10 @@ function renderPatterns() {
   }
   document.getElementById('patGrid').innerHTML = patCard('Creators by category', topCat, max(topCat)) + patCard('Top hook types used', topHook, max(topHook)) + patCard('Content formats', topFmt, max(topFmt));
 
-  const topViral = reels.filter(r => r.viral).sort((a, b) => parseViews(b.views) - parseViews(a.views)).slice(0, 5);
+  const topViral = reels.filter(r => r && r.viral).sort((a, b) => parseViews(b.views) - parseViews(a.views)).slice(0, 5);
   const tvEl = document.getElementById('topViralReels');
   tvEl.innerHTML = topViral.length ? `<div style="display:flex;flex-direction:column;gap:6px">` + topViral.map(r => {
-    const c = creators.find(x => x.id === r.cid);
+    const c = creators.find(x => x && x.id === r.cid);
     return `<div class="ri" style="background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:8px 11px">
       <div class="ri-date">${r.date || ''}</div>
       <div class="ri-body">
@@ -1378,13 +1399,14 @@ function renderPatterns() {
 function renderGrowthBars() {
   const gb = document.getElementById('growthBars');
   if (!gb) return;
-  const sorted = [...creators].sort((a, b) => parseFollowers(b.followers) - parseFollowers(a.followers)).slice(0, 8);
+  const validCreators = creators.filter(c => c && c.name);
+  const sorted = [...validCreators].sort((a, b) => parseFollowers(b.followers) - parseFollowers(a.followers)).slice(0, 8);
   const maxF = parseFollowers(sorted[0]?.followers) || 1;
   gb.innerHTML = sorted.map(c => {
     const f = parseFollowers(c.followers);
     const pct = Math.round((f / maxF) * 100);
     return `<div class="gb-item">
-      <div class="gb-name" title="${c.name}">${c.name}</div>
+      <div class="gb-name" title="${c.name || ''}">${c.name || ''}</div>
       <div class="gb-bar-bg"><div class="gb-bar" style="width:${pct}%"></div></div>
       <div class="gb-val">${fmt(f)}</div>
     </div>`;
@@ -1506,6 +1528,10 @@ async function saveInspiration() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Failed to save inspiration (${res.status})`);
+    }
     const created = await res.json();
     inspirations.unshift(created);
     document.getElementById('insCreator').value = '';
@@ -1514,7 +1540,7 @@ async function saveInspiration() {
     renderInspo();
     toast('Inspiration saved!');
   } catch (err) {
-    toast('Failed to save inspiration', 'err');
+    toast(err.message || 'Failed to save inspiration', 'err');
   }
 }
 
@@ -1570,6 +1596,10 @@ async function saveVA() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Failed to save alert (${res.status})`);
+    }
     const created = await res.json();
     viralAlerts.unshift(created);
     cancelVA();
@@ -1577,7 +1607,7 @@ async function saveVA() {
     updateStats();
     toast('Alert added!');
   } catch (err) {
-    toast('Failed to save alert', 'err');
+    toast(err.message || 'Failed to save alert', 'err');
   }
 }
 

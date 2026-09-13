@@ -11,6 +11,46 @@ let memoryStore = {
 };
 
 // ==========================================
+// HELPERS
+// ==========================================
+function parseFollowers(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  if (typeof v === 'number') return isNaN(v) ? 0 : Math.round(v);
+  const s = v.toString().toLowerCase().trim();
+  if (s.endsWith('m')) {
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : Math.round(n * 1e6);
+  }
+  if (s.endsWith('k')) {
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : Math.round(n * 1e3);
+  }
+  const clean = s.replace(/[^0-9]/g, '');
+  const parsed = parseInt(clean, 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function sanitizeDate(d) {
+  if (!d || typeof d !== 'string' || !d.trim()) return null;
+  const s = d.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const parsed = new Date(s);
+  if (isNaN(parsed.getTime())) return null;
+  return parsed.toISOString().split('T')[0];
+}
+
+function sanitizeTags(tags) {
+  if (Array.isArray(tags)) return tags;
+  if (typeof tags === 'string') {
+    try {
+      const parsed = JSON.parse(tags);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
+  }
+  return [];
+}
+
+// ==========================================
 // CREATORS
 // ==========================================
 async function getAllCreators() {
@@ -65,13 +105,13 @@ async function getCreatorById(id) {
 }
 
 async function createCreator(data) {
-  const id = data.id || Date.now();
-  // const followers = typeof data.followers === 'string' 
-  //   ? (parseInt(data.followers.replace(/[^0-9]/g, '')) || 0) 
-  //   : (Number(data.followers) || 0);
+  const id = data.id ? Number(data.id) : Date.now();
+  const followers = parseFollowers(data.followers);
+  const checkedDate = sanitizeDate(data.checked);
+  const tags = sanitizeTags(data.tags);
 
   if (isDbConnected()) {
-    const tagsJson = JSON.stringify(data.tags || []);
+    const tagsJson = JSON.stringify(tags);
     const text = `
       INSERT INTO creators (id, name, handle, followers, growth, eng, avg_v, category, badge, tags, freq, notes, checked, avatar, pinned)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13, $14, $15)
@@ -81,7 +121,7 @@ async function createCreator(data) {
       id,
       data.name,
       data.handle,
-      data.followers,
+      followers,
       data.growth || '',
       data.eng || '',
       data.avgV || '',
@@ -90,7 +130,7 @@ async function createCreator(data) {
       tagsJson,
       data.freq || '',
       data.notes || '',
-      data.checked || null,
+      checkedDate,
       data.avatar || null,
       Boolean(data.pinned)
     ];
@@ -106,7 +146,7 @@ async function createCreator(data) {
       avgV: row.avg_v || '',
       category: row.category || '',
       badge: row.badge || 'none',
-      tags: Array.isArray(row.tags) ? row.tags : JSON.parse(row.tags || '[]'),
+      tags: Array.isArray(row.tags) ? row.tags : (typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : []),
       freq: row.freq || '',
       notes: row.notes || '',
       checked: row.checked ? new Date(row.checked).toISOString().split('T')[0] : null,
@@ -125,10 +165,10 @@ async function createCreator(data) {
     avgV: data.avgV || '',
     category: data.category || 'Tech Hacks',
     badge: data.badge || 'none',
-    tags: data.tags || [],
+    tags,
     freq: data.freq || '',
     notes: data.notes || '',
-    checked: data.checked || null,
+    checked: checkedDate,
     avatar: data.avatar || null,
     pinned: Boolean(data.pinned)
   };
@@ -138,12 +178,12 @@ async function createCreator(data) {
 
 async function updateCreator(id, data) {
   const numId = Number(id);
-  const followers = typeof data.followers === 'string' 
-    ? (parseInt(data.followers.replace(/[^0-9]/g, '')) || 0) 
-    : (Number(data.followers) || 0);
+  const followers = parseFollowers(data.followers);
+  const checkedDate = sanitizeDate(data.checked);
+  const tags = sanitizeTags(data.tags);
 
   if (isDbConnected()) {
-    const tagsJson = JSON.stringify(data.tags || []);
+    const tagsJson = JSON.stringify(tags);
     const text = `
       UPDATE creators
       SET name = $1, handle = $2, followers = $3, growth = $4, eng = $5,
@@ -164,7 +204,7 @@ async function updateCreator(id, data) {
       tagsJson,
       data.freq || '',
       data.notes || '',
-      data.checked || null,
+      checkedDate,
       data.avatar !== undefined ? data.avatar : null,
       Boolean(data.pinned),
       numId
@@ -182,7 +222,7 @@ async function updateCreator(id, data) {
       avgV: row.avg_v || '',
       category: row.category || '',
       badge: row.badge || 'none',
-      tags: Array.isArray(row.tags) ? row.tags : JSON.parse(row.tags || '[]'),
+      tags: Array.isArray(row.tags) ? row.tags : (typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : []),
       freq: row.freq || '',
       notes: row.notes || '',
       checked: row.checked ? new Date(row.checked).toISOString().split('T')[0] : null,
@@ -197,6 +237,8 @@ async function updateCreator(id, data) {
     ...memoryStore.creators[idx],
     ...data,
     followers,
+    tags,
+    checked: checkedDate,
     avatar: data.avatar !== undefined ? data.avatar : memoryStore.creators[idx].avatar
   };
   return memoryStore.creators[idx];
@@ -535,9 +577,7 @@ async function seedDatabase(customData = null) {
 
     // Insert creators
     for (const c of data.creators || []) {
-      const followers = typeof c.followers === 'string'
-        ? (parseInt(c.followers.replace(/[^0-9]/g, '')) || 0)
-        : (Number(c.followers) || 0);
+      const followers = parseFollowers(c.followers);
 
       await query(
         `INSERT INTO creators (id, name, handle, followers, growth, eng, avg_v, category, badge, tags, freq, notes, checked, avatar, pinned)
@@ -552,10 +592,10 @@ async function seedDatabase(customData = null) {
           c.avgV || '',
           c.category || 'Tech Hacks',
           c.badge || 'none',
-          JSON.stringify(c.tags || []),
+          JSON.stringify(sanitizeTags(c.tags)),
           c.freq || '',
           c.notes || '',
-          c.checked || null,
+          sanitizeDate(c.checked),
           c.avatar || null,
           Boolean(c.pinned)
         ]

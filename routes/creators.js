@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(created);
   } catch (err) {
     console.error('Error creating creator:', err);
-    res.status(500).json({ error: 'Failed to create creator' });
+    res.status(500).json({ error: err.message || 'Failed to create creator' });
   }
 });
 
