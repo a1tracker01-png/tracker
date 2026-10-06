@@ -952,5 +952,49 @@
       "creator_ids": [14, 30, 31, 33, 35, 37]
     }
   ],
+  "categories": [
+    {
+      "id": "cat-tech-hacks",
+      "name": "Tech Hacks",
+      "description": "Shortcuts, device tricks, hidden settings, and lifehacks for tech users",
+      "color": "#7B2FBE",
+      "icon": "ti-bolt"
+    },
+    {
+      "id": "cat-ai-tools",
+      "name": "AI Tools",
+      "description": "Productivity amplifiers, generator tools, prompt secrets, and new AI releases",
+      "color": "#0284C7",
+      "icon": "ti-robot"
+    },
+    {
+      "id": "cat-general-tech",
+      "name": "General Tech",
+      "description": "Gadgets, smartphones, tech unboxings, reviews, and mainstream consumer tech",
+      "color": "#1D9E75",
+      "icon": "ti-device-laptop"
+    },
+    {
+      "id": "cat-ai-news",
+      "name": "AI News",
+      "description": "Breaking announcements, frontier models, industry analysis, and AI updates",
+      "color": "#D97706",
+      "icon": "ti-news"
+    },
+    {
+      "id": "cat-career-skills",
+      "name": "Career Skills",
+      "description": "Professional growth, coding tips, job hunting tricks, and portfolio advice",
+      "color": "#4F46E5",
+      "icon": "ti-briefcase"
+    },
+    {
+      "id": "cat-earn-grow",
+      "name": "Earn & Grow",
+      "description": "Monetization methods, freelancing advice, online income, and creator growth",
+      "color": "#E11D48",
+      "icon": "ti-currency-dollar"
+    }
+  ],
   "qNotes": "KEY OBSERVATIONS:\n- Mendy AI visual hooks performing best in AI niche right now\n- Secret/forbidden angle consistently getting high saves across all creators\n- News + personal impact format driving highest views for Vaibhav\n- Free tool angle always works for discovery hooks\n\nTO CHECK THIS WEEK:\n- Trakin AI new format change\n- Sahil Verma AI growth spike reason\n- Mendy AI latest reel hook analysis"
 }

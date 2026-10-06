@@ -129,6 +129,15 @@ async function initDB() {
           creator_ids JSONB DEFAULT '[]'::jsonb,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
+
+        CREATE TABLE IF NOT EXISTS categories (
+          id VARCHAR(100) PRIMARY KEY,
+          name VARCHAR(255) NOT NULL UNIQUE,
+          description TEXT,
+          color VARCHAR(50) DEFAULT '#0284C7',
+          icon VARCHAR(100) DEFAULT 'ti-category',
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
       `);
 
       console.log('✅ Database tables initialized successfully.');

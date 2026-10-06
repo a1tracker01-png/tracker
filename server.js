@@ -23,6 +23,7 @@ app.use('/api/inspirations', require('./routes/inspirations'));
 app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/playlists', require('./routes/playlists'));
+app.use('/api/categories', require('./routes/categories'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/seed', require('./routes/seed'));
 

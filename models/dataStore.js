@@ -8,6 +8,7 @@ let memoryStore = {
   inspirations: JSON.parse(JSON.stringify(preloadedData.inspirations || [])),
   viralAlerts: JSON.parse(JSON.stringify(preloadedData.viralAlerts || [])),
   playlists: JSON.parse(JSON.stringify(preloadedData.playlists || [])),
+  categories: JSON.parse(JSON.stringify(preloadedData.categories || [])),
   qNotes: preloadedData.qNotes || ''
 };
 
@@ -770,6 +771,183 @@ async function setCreatorPlaylists(creatorId, targetPlaylistIds) {
 }
 
 // ==========================================
+// CATEGORIES MANAGEMENT
+// ==========================================
+async function ensureDefaultCategories() {
+  if (isDbConnected()) {
+    try {
+      const chk = await query('SELECT COUNT(*) FROM categories');
+      if (chk.rows && Number(chk.rows[0].count) === 0) {
+        for (const cat of preloadedData.categories || []) {
+          await query(
+            `INSERT INTO categories (id, name, description, color, icon)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (name) DO NOTHING`,
+            [cat.id, cat.name, cat.description || '', cat.color || '#0284C7', cat.icon || 'ti-category']
+          );
+        }
+      }
+    } catch (e) {
+      console.warn('Categories ensure error:', e.message);
+    }
+  }
+}
+
+async function getAllCategories() {
+  if (isDbConnected()) {
+    await ensureDefaultCategories();
+    const res = await query('SELECT * FROM categories ORDER BY created_at ASC, name ASC');
+    const dbCats = res.rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#0284C7',
+      icon: row.icon || 'ti-category',
+      created_at: row.created_at
+    }));
+
+    // Auto-discover any categories present on existing creators not yet in table
+    const creatorCats = await query('SELECT DISTINCT category FROM creators WHERE category IS NOT NULL AND category != \'\'');
+    const existingNames = new Set(dbCats.map(c => c.name.toLowerCase()));
+    for (const r of creatorCats.rows) {
+      const catName = (r.category || '').trim();
+      if (catName && !existingNames.has(catName.toLowerCase())) {
+        const catId = `cat-${catName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        try {
+          await query(
+            `INSERT INTO categories (id, name, description, color, icon)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (name) DO NOTHING`,
+            [catId, catName, '', '#4F46E5', 'ti-tag']
+          );
+          dbCats.push({ id: catId, name: catName, description: '', color: '#4F46E5', icon: 'ti-tag' });
+          existingNames.add(catName.toLowerCase());
+        } catch (e) {}
+      }
+    }
+    return dbCats;
+  }
+  return memoryStore.categories;
+}
+
+async function getCategoryByName(name) {
+  const all = await getAllCategories();
+  return all.find(c => c.name.toLowerCase() === (name || '').toLowerCase()) || null;
+}
+
+async function createCategory(data) {
+  const name = (data.name || '').trim();
+  if (!name) throw new Error('Category name is required');
+  const id = data.id || `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}_${Date.now()}`;
+  const description = (data.description || '').trim();
+  const color = data.color || '#0284C7';
+  const icon = data.icon || 'ti-category';
+
+  if (isDbConnected()) {
+    const res = await query(
+      `INSERT INTO categories (id, name, description, color, icon)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (name) DO UPDATE SET description = EXCLUDED.description, color = EXCLUDED.color, icon = EXCLUDED.icon
+       RETURNING *`,
+      [id, name, description, color, icon]
+    );
+    const row = res.rows[0];
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#0284C7',
+      icon: row.icon || 'ti-category',
+      created_at: row.created_at
+    };
+  }
+
+  const existingIdx = memoryStore.categories.findIndex(c => c.name.toLowerCase() === name.toLowerCase());
+  const newCat = { id, name, description, color, icon, created_at: new Date().toISOString() };
+  if (existingIdx > -1) {
+    memoryStore.categories[existingIdx] = newCat;
+  } else {
+    memoryStore.categories.push(newCat);
+  }
+  return newCat;
+}
+
+async function updateCategory(oldName, data) {
+  const targetName = (oldName || '').trim();
+  const newName = (data.name || targetName).trim();
+  const description = data.description !== undefined ? data.description.trim() : undefined;
+  const color = data.color;
+  const icon = data.icon;
+
+  if (isDbConnected()) {
+    if (newName && newName !== targetName) {
+      await query('UPDATE creators SET category = $1 WHERE category = $2', [newName, targetName]);
+    }
+    const res = await query(
+      `UPDATE categories
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           color = COALESCE($3, color),
+           icon = COALESCE($4, icon)
+       WHERE name = $5
+       RETURNING *`,
+      [newName || null, description !== undefined ? description : null, color || null, icon || null, targetName]
+    );
+    if (!res.rows.length) return null;
+    const row = res.rows[0];
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#0284C7',
+      icon: row.icon || 'ti-category',
+      created_at: row.created_at
+    };
+  }
+
+  const cat = memoryStore.categories.find(c => c.name.toLowerCase() === targetName.toLowerCase());
+  if (!cat) return null;
+  if (newName && newName !== targetName) {
+    memoryStore.creators.forEach(c => { if (c.category === targetName) c.category = newName; });
+    cat.name = newName;
+  }
+  if (description !== undefined) cat.description = description;
+  if (color) cat.color = color;
+  if (icon) cat.icon = icon;
+  return cat;
+}
+
+async function deleteCategory(name, fallbackCategory = 'General Tech') {
+  const targetName = (name || '').trim();
+  if (isDbConnected()) {
+    await query('UPDATE creators SET category = $1 WHERE category = $2', [fallbackCategory, targetName]);
+    const res = await query('DELETE FROM categories WHERE name = $1 RETURNING id', [targetName]);
+    return res.rowCount > 0;
+  }
+  memoryStore.creators.forEach(c => { if (c.category === targetName) c.category = fallbackCategory; });
+  const prevLen = memoryStore.categories.length;
+  memoryStore.categories = memoryStore.categories.filter(c => c.name.toLowerCase() !== targetName.toLowerCase());
+  return memoryStore.categories.length < prevLen;
+}
+
+async function addCreatorToCategory(creatorId, categoryName) {
+  const numId = Number(creatorId);
+  const cat = (categoryName || '').trim();
+  if (isDbConnected()) {
+    const res = await query('UPDATE creators SET category = $1 WHERE id = $2 RETURNING *', [cat, numId]);
+    return res.rows.length > 0;
+  }
+  const creator = memoryStore.creators.find(c => c.id === numId);
+  if (!creator) return false;
+  creator.category = cat;
+  return true;
+}
+
+async function removeCreatorFromCategory(creatorId) {
+  return await addCreatorToCategory(creatorId, 'Unassigned');
+}
+
+// ==========================================
 // SEED & RESET DATABASE
 // ==========================================
 async function seedDatabase(customData = null) {
@@ -869,7 +1047,17 @@ async function seedDatabase(customData = null) {
       );
     }
 
-    console.log(`✅ Seeded ${data.creators?.length || 0} creators, playlists, and associated records into PostgreSQL Neon DB.`);
+    // Insert categories
+    for (const cat of data.categories || []) {
+      await query(
+        `INSERT INTO categories (id, name, description, color, icon)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (name) DO NOTHING`,
+        [cat.id, cat.name, cat.description || '', cat.color || '#0284C7', cat.icon || 'ti-category']
+      );
+    }
+
+    console.log(`✅ Seeded ${data.creators?.length || 0} creators, playlists, categories, and associated records into PostgreSQL Neon DB.`);
     return { success: true, count: data.creators?.length || 0, source: 'postgres' };
   } else {
     memoryStore = {
@@ -878,6 +1066,7 @@ async function seedDatabase(customData = null) {
       inspirations: JSON.parse(JSON.stringify(data.inspirations || [])),
       viralAlerts: JSON.parse(JSON.stringify(data.viralAlerts || [])),
       playlists: JSON.parse(JSON.stringify(data.playlists || [])),
+      categories: JSON.parse(JSON.stringify(data.categories || [])),
       qNotes: data.qNotes || ''
     };
     return { success: true, count: memoryStore.creators.length, source: 'memory_fallback' };
@@ -912,5 +1101,12 @@ module.exports = {
   addCreatorToPlaylist,
   removeCreatorFromPlaylist,
   setCreatorPlaylists,
+  getAllCategories,
+  getCategoryByName,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  addCreatorToCategory,
+  removeCreatorFromCategory,
   seedDatabase
 };
