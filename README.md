@@ -18,6 +18,7 @@ A complete fullstack competitor analysis and tracking platform built with **Node
      - `inspirations`: Saved inspiration cards with category type, notes, tags, and creator name.
      - `viral_alerts`: Active viral alerts and history tracking.
      - `quick_notes`: Freeform notepad.
+     - `playlists`: Custom dynamic playlists and category collections with custom theme colors, icons, descriptions, and creator memberships.
    - Automatic migrations: Tables are created automatically on server boot or during `npm run seed`.
 
 3. **Cloud Storage (Cloudinary)**:
@@ -100,6 +101,7 @@ qurion_competitor_tracker_developer_package/
 │   └── dataStore.js           # Database queries with in-memory fallback
 ├── routes/
 │   ├── creators.js            # Competitor CRUD, pin, mark-checked
+│   ├── playlists.js           # Playlist CRUD, creator member add/remove
 │   ├── reels.js               # Reel CRUD
 │   ├── inspirations.js        # Inspiration CRUD
 │   ├── alerts.js              # Viral alert CRUD

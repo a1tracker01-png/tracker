@@ -926,5 +926,31 @@
       "notes": "Classic Manoj format — numbered + time promise"
     }
   ],
+  "playlists": [
+    {
+      "id": "pl-instagram-growth",
+      "name": "Instagram Growth",
+      "description": "High-growth reel strategies, retention hooks, and rapid viral distribution",
+      "color": "#7B2FBE",
+      "icon": "ti-trending-up",
+      "creator_ids": [1, 5, 10, 11, 24]
+    },
+    {
+      "id": "pl-video-editors",
+      "name": "Video Editors",
+      "description": "Creators with cinematic visual hooks, pattern breaks, and editing inspiration",
+      "color": "#1D9E75",
+      "icon": "ti-video",
+      "creator_ids": [24, 32, 33, 42]
+    },
+    {
+      "id": "pl-ai-tools",
+      "name": "AI Tool Hunters",
+      "description": "Fast-paced AI tool reveals, productivity hacks, and prompt engineering spotlights",
+      "color": "#0284C7",
+      "icon": "ti-robot",
+      "creator_ids": [14, 30, 31, 33, 35, 37]
+    }
+  ],
   "qNotes": "KEY OBSERVATIONS:\n- Mendy AI visual hooks performing best in AI niche right now\n- Secret/forbidden angle consistently getting high saves across all creators\n- News + personal impact format driving highest views for Vaibhav\n- Free tool angle always works for discovery hooks\n\nTO CHECK THIS WEEK:\n- Trakin AI new format change\n- Sahil Verma AI growth spike reason\n- Mendy AI latest reel hook analysis"
 }

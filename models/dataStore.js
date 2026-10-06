@@ -7,6 +7,7 @@ let memoryStore = {
   reels: JSON.parse(JSON.stringify(preloadedData.reels || [])),
   inspirations: JSON.parse(JSON.stringify(preloadedData.inspirations || [])),
   viralAlerts: JSON.parse(JSON.stringify(preloadedData.viralAlerts || [])),
+  playlists: JSON.parse(JSON.stringify(preloadedData.playlists || [])),
   qNotes: preloadedData.qNotes || ''
 };
 
@@ -45,6 +46,21 @@ function sanitizeTags(tags) {
     try {
       const parsed = JSON.parse(tags);
       if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
+  }
+  return [];
+}
+
+function sanitizeCreatorIds(ids) {
+  if (Array.isArray(ids)) {
+    return Array.from(new Set(ids.map(Number).filter(n => !isNaN(n) && n > 0)));
+  }
+  if (typeof ids === 'string') {
+    try {
+      const parsed = JSON.parse(ids);
+      if (Array.isArray(parsed)) {
+        return Array.from(new Set(parsed.map(Number).filter(n => !isNaN(n) && n > 0)));
+      }
     } catch (e) {}
   }
   return [];
@@ -249,11 +265,26 @@ async function deleteCreator(id) {
   if (isDbConnected()) {
     await query('DELETE FROM reels WHERE cid = $1', [numId]);
     const res = await query('DELETE FROM creators WHERE id = $1 RETURNING id', [numId]);
+    try {
+      const plRes = await query('SELECT id, creator_ids FROM playlists');
+      for (const row of plRes.rows) {
+        const ids = sanitizeCreatorIds(row.creator_ids);
+        if (ids.includes(numId)) {
+          const filtered = ids.filter(x => x !== numId);
+          await query('UPDATE playlists SET creator_ids = $1::jsonb WHERE id = $2', [JSON.stringify(filtered), row.id]);
+        }
+      }
+    } catch (e) {}
     return res.rowCount > 0;
   }
   const prevLen = memoryStore.creators.length;
   memoryStore.creators = memoryStore.creators.filter(c => c.id !== numId);
   memoryStore.reels = memoryStore.reels.filter(r => r.cid !== numId);
+  if (memoryStore.playlists) {
+    memoryStore.playlists.forEach(pl => {
+      pl.creator_ids = (pl.creator_ids || []).filter(x => x !== numId);
+    });
+  }
   return memoryStore.creators.length < prevLen;
 }
 
@@ -566,6 +597,179 @@ async function saveQuickNotes(content) {
 }
 
 // ==========================================
+// PLAYLISTS / CUSTOM CATEGORIES
+// ==========================================
+async function ensureDefaultPlaylists() {
+  if (isDbConnected()) {
+    try {
+      const chk = await query('SELECT COUNT(*) FROM playlists');
+      if (chk.rows && Number(chk.rows[0].count) === 0) {
+        for (const pl of preloadedData.playlists || []) {
+          await query(
+            `INSERT INTO playlists (id, name, description, color, icon, creator_ids)
+             VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+             ON CONFLICT (id) DO NOTHING`,
+            [pl.id, pl.name, pl.description || '', pl.color || '#7B2FBE', pl.icon || 'ti-playlist', JSON.stringify(pl.creator_ids || [])]
+          );
+        }
+      }
+    } catch (e) {
+      console.warn('Playlist ensure error:', e.message);
+    }
+  }
+}
+
+async function getAllPlaylists() {
+  if (isDbConnected()) {
+    await ensureDefaultPlaylists();
+    const res = await query('SELECT * FROM playlists ORDER BY created_at ASC, id ASC');
+    return res.rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#7B2FBE',
+      icon: row.icon || 'ti-playlist',
+      creator_ids: sanitizeCreatorIds(row.creator_ids),
+      created_at: row.created_at
+    }));
+  }
+  return memoryStore.playlists;
+}
+
+async function getPlaylistById(id) {
+  if (isDbConnected()) {
+    const res = await query('SELECT * FROM playlists WHERE id = $1', [id]);
+    if (!res.rows.length) return null;
+    const row = res.rows[0];
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#7B2FBE',
+      icon: row.icon || 'ti-playlist',
+      creator_ids: sanitizeCreatorIds(row.creator_ids),
+      created_at: row.created_at
+    };
+  }
+  return memoryStore.playlists.find(p => p.id === id) || null;
+}
+
+async function createPlaylist(data) {
+  const id = data.id || `pl_${Date.now()}`;
+  const name = (data.name || '').trim();
+  const description = (data.description || '').trim();
+  const color = data.color || '#7B2FBE';
+  const icon = data.icon || 'ti-playlist';
+  const creator_ids = sanitizeCreatorIds(data.creator_ids);
+
+  if (isDbConnected()) {
+    const res = await query(
+      `INSERT INTO playlists (id, name, description, color, icon, creator_ids)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+       RETURNING *`,
+      [id, name, description, color, icon, JSON.stringify(creator_ids)]
+    );
+    const row = res.rows[0];
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#7B2FBE',
+      icon: row.icon || 'ti-playlist',
+      creator_ids: sanitizeCreatorIds(row.creator_ids),
+      created_at: row.created_at
+    };
+  }
+
+  const newPl = { id, name, description, color, icon, creator_ids, created_at: new Date().toISOString() };
+  memoryStore.playlists.push(newPl);
+  return newPl;
+}
+
+async function updatePlaylist(id, data) {
+  const existing = await getPlaylistById(id);
+  if (!existing) return null;
+
+  const name = data.name !== undefined ? data.name.trim() : existing.name;
+  const description = data.description !== undefined ? data.description.trim() : existing.description;
+  const color = data.color || existing.color;
+  const icon = data.icon || existing.icon;
+  const creator_ids = data.creator_ids !== undefined ? sanitizeCreatorIds(data.creator_ids) : existing.creator_ids;
+
+  if (isDbConnected()) {
+    const res = await query(
+      `UPDATE playlists
+       SET name = $1, description = $2, color = $3, icon = $4, creator_ids = $5::jsonb
+       WHERE id = $6
+       RETURNING *`,
+      [name, description, color, icon, JSON.stringify(creator_ids), id]
+    );
+    if (!res.rows.length) return null;
+    const row = res.rows[0];
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      color: row.color || '#7B2FBE',
+      icon: row.icon || 'ti-playlist',
+      creator_ids: sanitizeCreatorIds(row.creator_ids),
+      created_at: row.created_at
+    };
+  }
+
+  const idx = memoryStore.playlists.findIndex(p => p.id === id);
+  if (idx === -1) return null;
+  memoryStore.playlists[idx] = { ...memoryStore.playlists[idx], name, description, color, icon, creator_ids };
+  return memoryStore.playlists[idx];
+}
+
+async function deletePlaylist(id) {
+  if (isDbConnected()) {
+    const res = await query('DELETE FROM playlists WHERE id = $1 RETURNING id', [id]);
+    return res.rowCount > 0;
+  }
+  const prevLen = memoryStore.playlists.length;
+  memoryStore.playlists = memoryStore.playlists.filter(p => p.id !== id);
+  return memoryStore.playlists.length < prevLen;
+}
+
+async function addCreatorToPlaylist(playlistId, creatorId) {
+  const numId = Number(creatorId);
+  const pl = await getPlaylistById(playlistId);
+  if (!pl) return null;
+  if (!pl.creator_ids.includes(numId)) {
+    const updatedIds = [...pl.creator_ids, numId];
+    return await updatePlaylist(playlistId, { creator_ids: updatedIds });
+  }
+  return pl;
+}
+
+async function removeCreatorFromPlaylist(playlistId, creatorId) {
+  const numId = Number(creatorId);
+  const pl = await getPlaylistById(playlistId);
+  if (!pl) return null;
+  const updatedIds = pl.creator_ids.filter(id => id !== numId);
+  return await updatePlaylist(playlistId, { creator_ids: updatedIds });
+}
+
+async function setCreatorPlaylists(creatorId, targetPlaylistIds) {
+  const numId = Number(creatorId);
+  const allPlaylists = await getAllPlaylists();
+  const targetSet = new Set(targetPlaylistIds || []);
+
+  for (const pl of allPlaylists) {
+    const hasCreator = pl.creator_ids.includes(numId);
+    const shouldHave = targetSet.has(pl.id);
+    if (shouldHave && !hasCreator) {
+      await addCreatorToPlaylist(pl.id, numId);
+    } else if (!shouldHave && hasCreator) {
+      await removeCreatorFromPlaylist(pl.id, numId);
+    }
+  }
+  return await getAllPlaylists();
+}
+
+// ==========================================
 // SEED & RESET DATABASE
 // ==========================================
 async function seedDatabase(customData = null) {
@@ -573,7 +777,7 @@ async function seedDatabase(customData = null) {
 
   if (isDbConnected()) {
     // Clear existing records
-    await query('TRUNCATE TABLE reels, creators, inspirations, viral_alerts, quick_notes CASCADE;');
+    await query('TRUNCATE TABLE reels, creators, inspirations, viral_alerts, quick_notes, playlists CASCADE;');
 
     // Insert creators
     for (const c of data.creators || []) {
@@ -655,7 +859,17 @@ async function seedDatabase(customData = null) {
       );
     }
 
-    console.log(`✅ Seeded ${data.creators?.length || 0} creators and associated records into PostgreSQL Neon DB.`);
+    // Insert playlists
+    for (const pl of data.playlists || []) {
+      await query(
+        `INSERT INTO playlists (id, name, description, color, icon, creator_ids)
+         VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+         ON CONFLICT (id) DO NOTHING`,
+        [pl.id, pl.name, pl.description || '', pl.color || '#7B2FBE', pl.icon || 'ti-playlist', JSON.stringify(pl.creator_ids || [])]
+      );
+    }
+
+    console.log(`✅ Seeded ${data.creators?.length || 0} creators, playlists, and associated records into PostgreSQL Neon DB.`);
     return { success: true, count: data.creators?.length || 0, source: 'postgres' };
   } else {
     memoryStore = {
@@ -663,6 +877,7 @@ async function seedDatabase(customData = null) {
       reels: JSON.parse(JSON.stringify(data.reels || [])),
       inspirations: JSON.parse(JSON.stringify(data.inspirations || [])),
       viralAlerts: JSON.parse(JSON.stringify(data.viralAlerts || [])),
+      playlists: JSON.parse(JSON.stringify(data.playlists || [])),
       qNotes: data.qNotes || ''
     };
     return { success: true, count: memoryStore.creators.length, source: 'memory_fallback' };
@@ -689,5 +904,13 @@ module.exports = {
   deleteAlert,
   getQuickNotes,
   saveQuickNotes,
+  getAllPlaylists,
+  getPlaylistById,
+  createPlaylist,
+  updatePlaylist,
+  deletePlaylist,
+  addCreatorToPlaylist,
+  removeCreatorFromPlaylist,
+  setCreatorPlaylists,
   seedDatabase
 };
